@@ -6,353 +6,454 @@
 <title>CloudNine Rewards — Strategy Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
+:root{--bg:#080c14;--surface:#111927;--surface2:#1a2332;--border:#1e293b;--gold:#f59e0b;--gold-dim:#d97706;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--text:#e2e8f0;--muted:#64748b;--radius:16px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,sans-serif;background:#0f1419;color:#e2e8f0;line-height:1.5;padding:32px 24px}
-.dashboard{max-width:1200px;margin:0 auto}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden}
+::selection{background:rgba(245,158,11,0.3);color:#fff}
 
-/* Header */
-.header{margin-bottom:40px}
-.header h1{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px}
-.header h1 span{color:#f59e0b}
-.header p{font-size:14px;color:#64748b;margin-top:4px}
-.header-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
-.last-updated{font-size:12px;color:#475569;padding:6px 12px;background:#1e293b;border-radius:6px}
+/* ─── ORBITAL BG ─── */
+.bg-orb{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.bg-orb .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.15}
+.bg-orb .orb.o1{width:600px;height:600px;background:radial-gradient(circle,#f59e0b,transparent);top:-200px;right:-200px;animation:float1 20s ease-in-out infinite}
+.bg-orb .orb.o2{width:500px;height:500px;background:radial-gradient(circle,#3b82f6,transparent);bottom:-150px;left:-150px;animation:float2 25s ease-in-out infinite}
+.bg-orb .orb.o3{width:300px;height:300px;background:radial-gradient(circle,#8b5cf6,transparent);top:50%;left:50%;animation:float3 18s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,60px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-40px)}}
+@keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-30%,-60%) scale(1.2)}}
 
-/* KPI Grid */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
-.kpi-card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #2d3a4e;transition:border-color .2s}
-.kpi-card:hover{border-color:#3b4a64}
-.kpi-label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px}
-.kpi-main{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
-.kpi-current{font-size:32px;font-weight:800;color:#fff}
-.kpi-target{font-size:14px;color:#64748b}
-.kpi-target span{color:#f59e0b;font-weight:600}
-.kpi-progress{height:4px;background:#2d3a4e;border-radius:2px;margin-bottom:8px;overflow:hidden}
-.kpi-progress-fill{height:100%;border-radius:2px;transition:width .6s ease}
-.kpi-progress-fill.on-track{background:#22c55e}
-.kpi-progress-fill.at-risk{background:#f59e0b}
-.kpi-progress-fill.off-track{background:#ef4444}
-.kpi-progress-fill.not-started{background:#64748b}
-.kpi-detail{display:flex;justify-content:space-between;font-size:12px;color:#475569}
-.kpi-detail span{display:flex;align-items:center;gap:4px}
-.kpi-detail .status-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-.kpi-detail .status-dot.on-track{background:#22c55e}
-.kpi-detail .status-dot.at-risk{background:#f59e0b}
-.kpi-detail .status-dot.off-track{background:#ef4444}
-.kpi-detail .status-dot.not-started{background:#64748b}
-.kpi-unknown{font-size:12px;color:#64748b;font-style:italic}
+/* ─── GRID BG ─── */
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px}
 
-/* Row layout */
-.row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
-@media(max-width:768px){.row{grid-template-columns:1fr}}
+.dashboard{max-width:1200px;margin:0 auto;padding:24px;position:relative;z-index:1}
 
-/* Timeline */
-.timeline-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
-.timeline-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:20px}
-.phase-list{display:flex;flex-direction:column;gap:16px}
-.phase{display:grid;grid-template-columns:100px 1fr 100px;gap:16px;align-items:center;padding:12px 16px;background:#0f1419;border-radius:8px;border-left:3px solid}
-.phase.phase-1{border-left-color:#3b82f6}
-.phase.phase-2{border-left-color:#f59e0b}
-.phase.phase-3{border-left-color:#22c55e}
-.phase.phase-4{border-left-color:#8b5cf6}
-.phase-week{font-size:12px;color:#64748b;font-weight:600}
-.phase-info h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
-.phase-info p{font-size:12px;color:#64748b}
-.phase-budget{font-size:14px;font-weight:700;color:#f59e0b;text-align:right}
-.phase-status{font-size:11px;color:#64748b;text-align:right;margin-top:2px}
+/* ─── TOP BAR ─── */
+.top-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:48px;padding:16px 24px;background:rgba(17,25,39,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.06)}
+.top-bar-left{display:flex;align-items:center;gap:16px}
+.top-bar-logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#000;box-shadow:0 0 30px rgba(245,158,11,0.2)}
+.top-bar h1{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.top-bar h1 span{color:var(--gold)}
+.top-bar-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top-bar-meta .badge{font-size:11px;color:var(--muted);padding:6px 12px;background:rgba(255,255,255,0.04);border-radius:20px;border:1px solid rgba(255,255,255,0.06)}
+.export-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif}
+.export-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,158,11,0.3)}
+.export-btn svg{width:16px;height:16px}
+.export-btn.loading{opacity:0.7;pointer-events:none}
 
-/* Budget section */
-.budget-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
-.budget-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:20px}
-.budget-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px}
-.budget-total{font-size:28px;font-weight:800;color:#fff}
-.budget-total span{font-size:14px;color:#64748b;font-weight:400}
-.budget-rows{display:flex;flex-direction:column;gap:12px}
-.budget-row{display:grid;grid-template-columns:1fr 80px 200px;gap:12px;align-items:center}
-.budget-row .label{font-size:13px;color:#e2e8f0}
-.budget-row .amount{font-size:13px;font-weight:600;color:#f59e0b;text-align:right}
-.budget-row .bar-wrap{height:6px;background:#2d3a4e;border-radius:3px;overflow:hidden}
-.budget-row .bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#d97706)}
+/* ─── HERO SECTION (parallax) ─── */
+.hero{position:relative;margin-bottom:64px;padding:80px 0;text-align:center;overflow:hidden;border-radius:var(--radius);background:linear-gradient(135deg,rgba(17,25,39,0.8),rgba(26,35,50,0.4));border:1px solid rgba(255,255,255,0.04);transform:translateZ(0)}
+.hero-bg{position:absolute;top:0;left:0;width:100%;height:120%;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 30% 50%,rgba(245,158,11,0.06) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(59,130,246,0.06) 0%,transparent 60%);will-change:transform}
+.hero .inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
+.hero h2{font-size:clamp(32px,5vw,56px);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
+.hero h2 span{background:linear-gradient(135deg,var(--gold),var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--muted);max-width:560px;margin:0 auto 24px;line-height:1.6}
+.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:32px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:36px;font-weight:900;color:#fff;letter-spacing:-1px}
+.hero-stat .num.gold{color:var(--gold)}
+.hero-stat .num.blue{color:var(--blue)}
+.hero-stat .num.green{color:var(--green)}
+.hero-stat .label{font-size:13px;color:var(--muted);margin-top:4px}
 
-/* Risk section */
-.risk-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
-.risk-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
-.risk-table{width:100%;border-collapse:collapse}
-.risk-table th{text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;padding:8px 12px;border-bottom:1px solid #2d3a4e}
-.risk-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #1a2332;vertical-align:middle}
-.risk-table tr:last-child td{border-bottom:none}
-.risk-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.risk-badge.high{background:rgba(239,68,68,0.15);color:#ef4444}
-.risk-badge.medium{background:rgba(245,158,11,0.15);color:#f59e0b}
-.risk-badge.low{background:rgba(34,197,94,0.15);color:#22c55e}
+/* ─── SECTION REVEAL ─── */
+.section{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.section.visible{opacity:1;transform:translateY(0)}
 
-/* Targets table */
-.targets-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
-.targets-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
-.targets-table{width:100%;border-collapse:collapse}
-.targets-table th{text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;padding:8px 12px;border-bottom:1px solid #2d3a4e}
-.targets-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #1a2332}
-.targets-table tr:last-child td{border-bottom:none}
-.targets-table .metric-name{color:#e2e8f0;font-weight:600}
-.targets-table .metric-current{color:#64748b}
-.targets-table .metric-six{color:#f59e0b;font-weight:600}
-.targets-table .metric-twelve{color:#22c55e;font-weight:600}
+/* ─── GLASS CARD ─── */
+.glass{background:rgba(17,25,39,0.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:28px;transition:all .3s}
+.glass:hover{border-color:rgba(255,255,255,0.1);box-shadow:0 8px 40px rgba(0,0,0,0.3)}
+.glass-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:0.03em}
+.glass-title .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.glass-title .icon.ic-gold{background:rgba(245,158,11,0.15);color:var(--gold)}
+.glass-title .icon.ic-blue{background:rgba(59,130,246,0.15);color:var(--blue)}
+.glass-title .icon.ic-green{background:rgba(34,197,94,0.15);color:var(--green)}
+.glass-title .icon.ic-purple{background:rgba(139,92,246,0.15);color:var(--purple)}
 
-.text-center{text-align:center}
-.gold{color:#f59e0b}
-.green{color:#22c55e}
-.muted{color:#64748b}
+/* ─── KPI GRID ─── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:32px}
+.kpi-card{background:rgba(17,25,39,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:var(--radius);padding:24px;border:1px solid rgba(255,255,255,0.05);transition:all .35s;position:relative;overflow:hidden}
+.kpi-card:hover{transform:translateY(-4px);border-color:rgba(245,158,11,0.2);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
+.kpi-card .glow{position:absolute;top:-50%;right:-50%;width:100%;height:100%;background:radial-gradient(circle,rgba(245,158,11,0.03),transparent 70%);pointer-events:none;transition:opacity .5s}
+.kpi-card:hover .glow{opacity:1}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;position:relative;z-index:1}
+.kpi-main{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;position:relative;z-index:1}
+.kpi-current{font-size:34px;font-weight:900;color:#fff;letter-spacing:-0.5px}
+.kpi-target{font-size:13px;color:var(--muted)}
+.kpi-target span{color:var(--gold);font-weight:700}
+.kpi-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:4px;margin-bottom:10px;overflow:hidden;position:relative;z-index:1}
+.kpi-bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1);width:0}
+.kpi-bar-fill.gold-bg{background:linear-gradient(90deg,var(--gold),var(--gold-dim))}
+.kpi-bar-fill.green-bg{background:linear-gradient(90deg,var(--green),#16a34a)}
+.kpi-bar-fill.blue-bg{background:linear-gradient(90deg,var(--blue),#2563eb)}
+.kpi-bar-fill.purple-bg{background:linear-gradient(90deg,var(--purple),#7c3aed)}
+.kpi-bar-fill.gray-bg{background:linear-gradient(90deg,var(--muted),#475569)}
+.kpi-detail{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);position:relative;z-index:1}
+.kpi-detail .tag{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.kpi-detail .tag.at-risk{background:rgba(245,158,11,0.12);color:var(--gold)}
+.kpi-detail .tag.not-started{background:rgba(100,116,139,0.12);color:var(--muted)}
+.kpi-detail .tag.on-track{background:rgba(34,197,94,0.12);color:var(--green)}
+.kpi-detail .tag.off-track{background:rgba(239,68,68,0.12);color:var(--red)}
+
+/* ─── TWO-COLUMN ─── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+
+/* ─── PHASE LIST ─── */
+.phase-list{display:flex;flex-direction:column;gap:12px}
+.phase{display:grid;grid-template-columns:90px 1fr 90px;gap:14px;align-items:center;padding:16px 18px;background:rgba(0,0,0,0.2);border-radius:12px;border-left:3px solid;transition:all .25s;position:relative;overflow:hidden}
+.phase:hover{background:rgba(0,0,0,0.35);transform:translateX(4px)}
+.phase::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.02));pointer-events:none}
+.phase.p1{border-left-color:var(--blue)}
+.phase.p2{border-left-color:var(--gold)}
+.phase.p3{border-left-color:var(--green)}
+.phase.p4{border-left-color:var(--purple)}
+.phase-week{font-size:12px;color:var(--muted);font-weight:600}
+.phase-info h3{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.phase-info p{font-size:12px;color:var(--muted)}
+.phase-amount{font-size:15px;font-weight:800;color:var(--gold);text-align:right}
+.phase-status{font-size:10px;color:var(--muted);text-align:right;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em}
+
+/* ─── BUDGET DONUT ─── */
+.budget-donut{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.budget-item{display:flex;align-items:center;gap:14px}
+.budget-item .swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.budget-item .swatch.s1{background:var(--blue)}
+.budget-item .swatch.s2{background:var(--gold)}
+.budget-item .swatch.s3{background:var(--green)}
+.budget-item .swatch.s4{background:var(--purple)}
+.budget-item .b-label{flex:1;font-size:13px;color:var(--text)}
+.budget-item .b-pct{font-size:13px;font-weight:700;color:var(--gold);width:50px;text-align:right}
+.budget-item .b-amt{font-size:12px;color:var(--muted);width:60px;text-align:right}
+.budget-item .b-track{flex:0 0 120px;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.budget-item .b-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.budget-total-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;margin-top:14px;border-top:1px solid rgba(255,255,255,0.06)}
+.budget-total-row span:first-child{font-size:13px;color:var(--muted)}
+.budget-total-row .total-num{font-size:24px;font-weight:900;color:#fff}
+.budget-total-row .total-num small{font-size:13px;color:var(--muted);font-weight:400}
+.budget-roi{text-align:right;font-size:12px;color:var(--green);margin-top:4px}
+
+/* ─── TABLE BASE ─── */
+.table-wrap{overflow-x:auto}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:13px}
+.table-wrap th{text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);white-space:nowrap}
+.table-wrap td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle}
+.table-wrap tr:last-child td{border-bottom:none}
+.table-wrap tr:hover td{background:rgba(255,255,255,0.02)}
+.metric-n{color:#fff;font-weight:600}
+.metric-c{color:var(--muted)}
+.metric-6{color:var(--gold);font-weight:700}
+.metric-12{color:var(--green);font-weight:700}
+
+/* risk badges */
+.risk-b{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.risk-b.high{background:rgba(239,68,68,0.12);color:var(--red)}
+.risk-b.med{background:rgba(245,158,11,0.12);color:var(--gold)}
+.risk-b.low{background:rgba(34,197,94,0.12);color:var(--green)}
+
+/* ─── FOOTER ─── */
+.footer{text-align:center;font-size:12px;color:var(--muted);padding:32px 0 16px;border-top:1px solid rgba(255,255,255,0.04);margin-top:32px}
+
+/* ─── EXPORT OVERLAY ─── */
+.export-progress{position:fixed;bottom:32px;right:32px;z-index:999;background:rgba(17,25,39,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px 20px;display:none;align-items:center;gap:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.export-progress.show{display:flex}
+.export-progress .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.export-progress .txt{font-size:13px;color:var(--text)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px){
+  .dashboard{padding:12px}
+  .top-bar{padding:12px 16px;flex-direction:column;align-items:stretch}
+  .top-bar-meta{justify-content:space-between}
+  .hero{padding:48px 20px}
+  .hero-stats{gap:24px}
+  .hero-stat .num{font-size:28px}
+  .kpi-grid{grid-template-columns:1fr}
+  .phase{grid-template-columns:1fr;gap:6px;padding:12px 14px}
+  .phase-week,.phase-amount,.phase-status{text-align:left}
+  .table-wrap td,.table-wrap th{padding:8px 8px;font-size:12px}
+}
 </style>
 </head>
 <body>
-<div class="dashboard">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-row">
-      <div>
-        <h1>CloudNine <span>Rewards</span></h1>
-        <p>Strategy Dashboard — Experience & Retention Programme</p>
-      </div>
-      <div class="last-updated">Last updated: June 2026</div>
+<div class="bg-orb">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="dashboard" id="dashboard-content">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="top-bar-logo">C9</div>
+      <h1>CloudNine <span>Rewards</span></h1>
+    </div>
+    <div class="top-bar-meta">
+      <span class="badge">Updated June 2026</span>
+      <button class="export-btn" id="exportPdfBtn" onclick="exportPDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Export PDF
+      </button>
     </div>
   </div>
 
-  <!-- KPI Grid -->
-  <div class="kpi-grid">
+  <!-- HERO -->
+  <section class="hero" data-parallax data-speed="0.15">
+    <div class="hero-bg" data-parallax data-speed="0.08"></div>
+    <div class="inner">
+      <h2>Experience &amp; Retention<br><span>Strategy Dashboard</span></h2>
+      <p>A connected three-part retention system to reduce loyalty dormancy, eliminate post-booking friction, and grow ancillary revenue — built for CloudNine's budget airline context.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num gold">4M</div><div class="label">Annual Passengers</div></div>
+        <div class="hero-stat"><div class="num blue">800K</div><div class="label">Loyalty Members</div></div>
+        <div class="hero-stat"><div class="num green">£500K</div><div class="label">Programme Budget</div></div>
+        <div class="hero-stat"><div class="num gold">3-5x</div><div class="label">Target ROI</div></div>
+      </div>
+    </div>
+  </section>
 
+  <!-- KPI GRID -->
+  <div class="kpi-grid section">
     <div class="kpi-card">
+      <div class="glow"></div>
       <div class="kpi-label">Loyalty Active Rate</div>
       <div class="kpi-main">
-        <div class="kpi-current">15%</div>
+        <div class="kpi-current" data-count="15">0%</div>
         <div class="kpi-target">→ <span>30%</span> (6mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill at-risk" style="width:37%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot at-risk"></span> Off pace</span>
-        <span>680k dormant</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gold-bg" data-width="37"></div></div>
+      <div class="kpi-detail"><span class="tag at-risk">● Off pace</span><span>680k dormant</span></div>
     </div>
-
     <div class="kpi-card">
-      <div class="kpi-label">PPAR (per-passenger ancillary)</div>
+      <div class="glow"></div>
+      <div class="kpi-label">PPAR per passenger</div>
       <div class="kpi-main">
-        <div class="kpi-current">--</div>
+        <div class="kpi-current" style="color:var(--muted)">--</div>
         <div class="kpi-target">→ <span>+30%</span> (12mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot not-started"></span> No baseline</span>
-        <span class="kpi-unknown">Industry avg: ~$90/pp</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gray-bg" data-width="0"></div></div>
+      <div class="kpi-detail"><span class="tag not-started">● No baseline</span><span style="font-size:11px;color:var(--muted)">Industry avg: ~$90/pp</span></div>
     </div>
-
     <div class="kpi-card">
+      <div class="glow"></div>
       <div class="kpi-label">Post-Booking Email Open Rate</div>
       <div class="kpi-main">
-        <div class="kpi-current">&lt;40%</div>
+        <div class="kpi-current" data-count="38">0%</div>
         <div class="kpi-target">→ <span>55%</span> (6mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill at-risk" style="width:30%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot at-risk"></span> Needs improvement</span>
-        <span>Target: 60% (12mo)</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gold-bg" data-width="30"></div></div>
+      <div class="kpi-detail"><span class="tag at-risk">● Needs improvement</span><span>Target: 60% (12mo)</span></div>
     </div>
-
     <div class="kpi-card">
+      <div class="glow"></div>
       <div class="kpi-label">Onboarding Completion Rate</div>
       <div class="kpi-main">
-        <div class="kpi-current">--</div>
+        <div class="kpi-current" style="color:var(--muted)">--</div>
         <div class="kpi-target">→ <span>40%</span> (6mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot not-started"></span> Not tracked</span>
-        <span class="kpi-unknown">No current data</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gray-bg" data-width="0"></div></div>
+      <div class="kpi-detail"><span class="tag not-started">● Not tracked</span><span style="font-size:11px;color:var(--muted)">No current data</span></div>
     </div>
-
     <div class="kpi-card">
+      <div class="glow"></div>
       <div class="kpi-label">Self-Service Adoption Rate</div>
       <div class="kpi-main">
-        <div class="kpi-current">--</div>
+        <div class="kpi-current" style="color:var(--muted)">--</div>
         <div class="kpi-target">→ <span>60%</span> (6mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot not-started"></span> Not tracked</span>
-        <span class="kpi-unknown">Needs self-service hub first</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gray-bg" data-width="0"></div></div>
+      <div class="kpi-detail"><span class="tag not-started">● Not tracked</span><span style="font-size:11px;color:var(--muted)">Needs self-service hub first</span></div>
     </div>
-
     <div class="kpi-card">
-      <div class="kpi-label">Redemption Rate (points earned → used)</div>
+      <div class="glow"></div>
+      <div class="kpi-label">Redemption Rate (points → used)</div>
       <div class="kpi-main">
-        <div class="kpi-current">--</div>
+        <div class="kpi-current" style="color:var(--muted)">--</div>
         <div class="kpi-target">→ <span>30%</span> (6mo)</div>
       </div>
-      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
-      <div class="kpi-detail">
-        <span><span class="status-dot not-started"></span> Not tracked</span>
-        <span class="kpi-unknown">Needs loyalty reboot first</span>
-      </div>
+      <div class="kpi-bar"><div class="kpi-bar-fill gray-bg" data-width="0"></div></div>
+      <div class="kpi-detail"><span class="tag not-started">● Not tracked</span><span style="font-size:11px;color:var(--muted)">Needs loyalty reboot first</span></div>
     </div>
-
   </div>
 
-  <!-- Two-column: Timeline + Budget -->
-  <div class="row">
-
-    <!-- Timeline -->
-    <div class="timeline-section">
-      <h2>Implementation Timeline</h2>
+  <!-- TWO-COLUMN: Timeline + Budget -->
+  <div class="two-col section">
+    <div class="glass">
+      <div class="glass-title"><span class="icon ic-blue">◈</span> Implementation Timeline</div>
       <div class="phase-list">
-
-        <div class="phase phase-1">
-          <div class="phase-week">Weeks 1-4</div>
-          <div class="phase-info">
-            <h3>Foundation</h3>
-            <p>Email system • Self-service hub • Loyalty reconfig • Apple/Google Pay</p>
-          </div>
-          <div>
-            <div class="phase-budget">£200k</div>
-            <div class="phase-status">In progress</div>
-          </div>
-        </div>
-
-        <div class="phase phase-2">
-          <div class="phase-week">Weeks 5-6</div>
-          <div class="phase-info">
-            <h3>Launch — Re-engagement</h3>
-            <p>SMS dormant reactivation (680k) • Non-member acquisition start</p>
-          </div>
-          <div>
-            <div class="phase-budget">£100k</div>
-            <div class="phase-status">Not started</div>
-          </div>
-        </div>
-
-        <div class="phase phase-3">
-          <div class="phase-week">Weeks 7-12</div>
-          <div class="phase-info">
-            <h3>Journey Activation</h3>
-            <p>6-message sequence live • Contextual offers • Loyalty moments</p>
-          </div>
-          <div>
-            <div class="phase-budget">£50k</div>
-            <div class="phase-status">Not started</div>
-          </div>
-        </div>
-
-        <div class="phase phase-4">
-          <div class="phase-week">Months 3-6</div>
-          <div class="phase-info">
-            <h3>Optimisation & Scale</h3>
-            <p>A/B testing • Route personalisation • Bundles • Referral programme</p>
-          </div>
-          <div>
-            <div class="phase-budget">£150k</div>
-            <div class="phase-status">Not started</div>
-          </div>
-        </div>
-
+        <div class="phase p1"><div class="phase-week">Weeks 1-4</div><div class="phase-info"><h3>Foundation</h3><p>Email system · Self-service hub · Loyalty reconfig · Apple/Google Pay</p></div><div><div class="phase-amount">£200k</div><div class="phase-status">In progress</div></div></div>
+        <div class="phase p2"><div class="phase-week">Weeks 5-6</div><div class="phase-info"><h3>Launch — Re-engagement</h3><p>SMS dormant reactivation (680k) · Non-member acquisition</p></div><div><div class="phase-amount">£100k</div><div class="phase-status">Not started</div></div></div>
+        <div class="phase p3"><div class="phase-week">Weeks 7-12</div><div class="phase-info"><h3>Journey Activation</h3><p>6-message sequence · Contextual offers · Loyalty moments</p></div><div><div class="phase-amount">£50k</div><div class="phase-status">Not started</div></div></div>
+        <div class="phase p4"><div class="phase-week">Months 3-6</div><div class="phase-info"><h3>Optimisation &amp; Scale</h3><p>A/B testing · Route personalisation · Bundles · Referral programme</p></div><div><div class="phase-amount">£150k</div><div class="phase-status">Not started</div></div></div>
       </div>
     </div>
-
-    <!-- Budget -->
-    <div class="budget-section">
-      <h2>Budget Allocation</h2>
-      <div class="budget-header">
-        <div class="budget-total">£500k <span>total</span></div>
-        <div style="font-size:13px;color:#22c55e">Target ROI: 3-5x in 12 months</div>
-      </div>
-      <div class="budget-rows">
-        <div class="budget-row">
-          <span class="label">Foundation</span>
-          <span class="amount">£200k</span>
-          <div class="bar-wrap"><div class="bar-fill" style="width:40%"></div></div>
-        </div>
-        <div class="budget-row">
-          <span class="label">Re-engagement Launch</span>
-          <span class="amount">£100k</span>
-          <div class="bar-wrap"><div class="bar-fill" style="width:20%"></div></div>
-        </div>
-        <div class="budget-row">
-          <span class="label">Journey Activation</span>
-          <span class="amount">£50k</span>
-          <div class="bar-wrap"><div class="bar-fill" style="width:10%"></div></div>
-        </div>
-        <div class="budget-row">
-          <span class="label">Optimisation & Scale</span>
-          <span class="amount">£150k</span>
-          <div class="bar-wrap"><div class="bar-fill" style="width:30%"></div></div>
-        </div>
+    <div class="glass">
+      <div class="glass-title"><span class="icon ic-gold">◈</span> Budget Allocation</div>
+      <div class="budget-donut">
+        <div class="budget-item"><div class="swatch s1"></div><span class="b-label">Foundation</span><div class="b-track"><div class="b-fill" style="width:40%;background:var(--blue)"></div></div><span class="b-pct">40%</span><span class="b-amt">£200k</span></div>
+        <div class="budget-item"><div class="swatch s2"></div><span class="b-label">Re-engagement</span><div class="b-track"><div class="b-fill" style="width:20%;background:var(--gold)"></div></div><span class="b-pct">20%</span><span class="b-amt">£100k</span></div>
+        <div class="budget-item"><div class="swatch s3"></div><span class="b-label">Journey Activation</span><div class="b-track"><div class="b-fill" style="width:10%;background:var(--green)"></div></div><span class="b-pct">10%</span><span class="b-amt">£50k</span></div>
+        <div class="budget-item"><div class="swatch s4"></div><span class="b-label">Optimisation &amp; Scale</span><div class="b-track"><div class="b-fill" style="width:30%;background:var(--purple)"></div></div><span class="b-pct">30%</span><span class="b-amt">£150k</span></div>
+        <div class="budget-total-row"><span>Total programme cost</span><span class="total-num">£500k <small>capital</small></span></div>
+        <div class="budget-roi">Target revenue uplift: 3-5x ROI within 12 months</div>
       </div>
     </div>
-
   </div>
 
-  <!-- Targets Table -->
-  <div class="targets-section">
-    <h2>KPI Targets</h2>
-    <table class="targets-table">
-      <thead>
-        <tr><th>Metric</th><th>Current</th><th>6-Month Target</th><th>12-Month Target</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="metric-name">Loyalty Active Rate</td><td class="metric-current">15%</td><td class="metric-six">30%</td><td class="metric-twelve">40%</td></tr>
-        <tr><td class="metric-name">PPAR (per-passenger ancillary) Increase</td><td class="metric-current">--</td><td class="metric-six">+20%</td><td class="metric-twelve">+30%</td></tr>
-        <tr><td class="metric-name">Post-Booking Email Open Rate</td><td class="metric-current">&lt;40%</td><td class="metric-six">55%</td><td class="metric-twelve">60%</td></tr>
-        <tr><td class="metric-name">Onboarding Completion Rate</td><td class="metric-current">--</td><td class="metric-six">40%</td><td class="metric-twelve">50%</td></tr>
-        <tr><td class="metric-name">Self-Service Adoption Rate</td><td class="metric-current">--</td><td class="metric-six">60%</td><td class="metric-twelve">75%</td></tr>
-        <tr><td class="metric-name">Redemption Rate (points earned → used)</td><td class="metric-current">--</td><td class="metric-six">30%</td><td class="metric-twelve">45%</td></tr>
-      </tbody>
-    </table>
+  <!-- TARGETS TABLE -->
+  <div class="glass section" style="margin-bottom:24px">
+    <div class="glass-title"><span class="icon ic-green">◈</span> KPI Targets</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Current</th><th>6-Month Target</th><th>12-Month Target</th></tr></thead>
+        <tbody>
+          <tr><td class="metric-n">Loyalty Active Rate</td><td class="metric-c">15%</td><td class="metric-6">30%</td><td class="metric-12">40%</td></tr>
+          <tr><td class="metric-n">PPAR Increase</td><td class="metric-c">--</td><td class="metric-6">+20%</td><td class="metric-12">+30%</td></tr>
+          <tr><td class="metric-n">Post-Booking Email Open Rate</td><td class="metric-c">&lt;40%</td><td class="metric-6">55%</td><td class="metric-12">60%</td></tr>
+          <tr><td class="metric-n">Onboarding Completion Rate</td><td class="metric-c">--</td><td class="metric-6">40%</td><td class="metric-12">50%</td></tr>
+          <tr><td class="metric-n">Self-Service Adoption Rate</td><td class="metric-c">--</td><td class="metric-6">60%</td><td class="metric-12">75%</td></tr>
+          <tr><td class="metric-n">Redemption Rate</td><td class="metric-c">--</td><td class="metric-6">30%</td><td class="metric-12">45%</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Risk Register -->
-  <div class="risk-section">
-    <h2>Risk Register</h2>
-    <table class="risk-table">
-      <thead>
-        <tr><th style="width:25%">Risk</th><th style="width:10%">Likelihood</th><th style="width:10%">Impact</th><th style="width:55%">Mitigation</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Points expiry backlash</td>
-          <td><span class="risk-badge medium">Medium</span></td>
-          <td><span class="risk-badge high">High</span></td>
-          <td class="muted">Frame as "use it or lose it" with clear value. Offer grace period for first re-engagement wave.</td>
-        </tr>
-        <tr>
-          <td>SMS opt-out rates high</td>
-          <td><span class="risk-badge medium">Medium</span></td>
-          <td><span class="risk-badge medium">Medium</span></td>
-          <td class="muted">Cap at 2 SMS/month per dormant member. Offer email-only preference during sign-up.</td>
-        </tr>
-        <tr>
-          <td>Post-booking email fatigue</td>
-          <td><span class="risk-badge low">Low</span></td>
-          <td><span class="risk-badge medium">Medium</span></td>
-          <td class="muted">Cap at 6 messages per journey. A/B test frequency. Easy unsubscribe in every message.</td>
-        </tr>
-        <tr>
-          <td>Loyalty system integration delays</td>
-          <td><span class="risk-badge medium">Medium</span></td>
-          <td><span class="risk-badge high">High</span></td>
-          <td class="muted">Start Phase 1 early. Manual fallback for welcome rewards if system not ready.</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- RISK REGISTER -->
+  <div class="glass section" style="margin-bottom:24px">
+    <div class="glass-title"><span class="icon ic-purple">◈</span> Risk Register</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:22%">Risk</th><th style="width:10%">Likelihood</th><th style="width:10%">Impact</th><th style="width:58%">Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td class="metric-n">Points expiry backlash</td><td><span class="risk-b med">Medium</span></td><td><span class="risk-b high">High</span></td><td style="color:var(--muted)">Frame as "use it or lose it" with clear value communication. Offer grace period for first re-engagement wave.</td></tr>
+          <tr><td class="metric-n">SMS opt-out rates high</td><td><span class="risk-b med">Medium</span></td><td><span class="risk-b med">Medium</span></td><td style="color:var(--muted)">Cap at 2 SMS/month per dormant member. Offer email-only preference during sign-up.</td></tr>
+          <tr><td class="metric-n">Post-booking email fatigue</td><td><span class="risk-b low">Low</span></td><td><span class="risk-b med">Medium</span></td><td style="color:var(--muted)">Cap at 6 messages per journey. A/B test frequency. Easy unsubscribe in every message.</td></tr>
+          <tr><td class="metric-n">Loyalty system integration delays</td><td><span class="risk-b med">Medium</span></td><td><span class="risk-b high">High</span></td><td style="color:var(--muted)">Start Phase 1 early. Manual fallback for welcome rewards if system not ready.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="text-center muted" style="font-size:12px;padding:16px 0;border-top:1px solid #1e293b;margin-top:24px">
-    CloudNine Rewards Strategy Dashboard • Based on Octopus multi-agent pipeline analysis
-  </div>
-
+  <div class="footer">CloudNine Rewards Strategy Dashboard · Built from Octopus multi-agent pipeline analysis</div>
 </div>
+
+<!-- EXPORT OVERLAY -->
+<div class="export-progress" id="exportOverlay">
+  <div class="spinner"></div>
+  <span class="txt">Generating PDF…</span>
+</div>
+
+<script>
+/* ─── PARALLAX ─── */
+(function(){
+  var els = document.querySelectorAll('[data-parallax]');
+  if(els.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    window.addEventListener('scroll', function(){
+      var sy = window.pageYOffset;
+      els.forEach(function(el){
+        var speed = parseFloat(el.getAttribute('data-speed')) || 0.1;
+        var rect = el.getBoundingClientRect();
+        if(rect.top < window.innerHeight && rect.bottom > 0){
+          var offset = sy * speed;
+          el.style.transform = 'translate3d(0,' + offset + 'px,0)';
+        }
+      });
+    }, {passive:true});
+  }
+})();
+
+/* ─── SECTION REVEAL (Intersection Observer) ─── */
+(function(){
+  var sections = document.querySelectorAll('.section');
+  if(sections.length && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.08});
+    sections.forEach(function(s){ obs.observe(s); });
+  }
+})();
+
+/* ─── ANIMATED COUNTERS ─── */
+(function(){
+  var counters = document.querySelectorAll('[data-count]');
+  if(counters.length && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var target = parseInt(el.getAttribute('data-count'));
+          var dur = 1200;
+          var start = performance.now();
+          function frame(now){
+            var p = Math.min((now - start) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3);
+            var val = Math.round(eased * target);
+            el.textContent = val + (el.getAttribute('data-count').indexOf('.') > -1 ? '.' + (target % 1 * 10).toFixed(0) : '%');
+            if(p < 1) requestAnimationFrame(frame);
+            else el.textContent = target + (target === 15 || target === 38 ? '%' : '%');
+          }
+          requestAnimationFrame(frame);
+          obs.unobserve(el);
+        }
+      });
+    }, {threshold:0.5});
+    counters.forEach(function(c){ obs.observe(c); });
+  }
+})();
+
+/* ─── KPI BAR ANIMATION ─── */
+(function(){
+  var bars = document.querySelectorAll('.kpi-bar-fill[data-width]');
+  if(bars.length && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var w = parseInt(el.getAttribute('data-width'));
+          setTimeout(function(){ el.style.width = w + '%'; }, 200);
+          obs.unobserve(el);
+        }
+      });
+    }, {threshold:0.3});
+    bars.forEach(function(b){ obs.observe(b); });
+  }
+})();
+
+/* ─── PDF EXPORT ─── */
+function exportPDF(){
+  var btn = document.getElementById('exportPdfBtn');
+  var overlay = document.getElementById('exportOverlay');
+  btn.classList.add('loading');
+  overlay.classList.add('show');
+  var el = document.getElementById('dashboard-content');
+  var opt = {
+    margin:        [0.4, 0.4, 0.4, 0.4],
+    filename:      'CloudNine-Rewards-Strategy-Dashboard.pdf',
+    image:         { type: 'jpeg', quality: 0.95 },
+    html2canvas:   { scale: 2, useCORS: true, backgroundColor: '#080c14' },
+    jsPDF:         { unit: 'in', format: 'a3', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(el).save().then(function(){
+    btn.classList.remove('loading');
+    overlay.classList.remove('show');
+  }).catch(function(){
+    btn.classList.remove('loading');
+    overlay.classList.remove('show');
+    alert('PDF export failed. Check console for details.');
+  });
+}
+</script>
 </body>
 </html>
