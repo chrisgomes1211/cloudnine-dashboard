@@ -337,9 +337,77 @@ border-radius:50%/100% 100% 0 0;filter:blur(40px);opacity:0.5}
   .scroll-top{bottom:12px;right:12px;width:36px;height:36px;font-size:16px}
   .bg-sun{width:300px;height:150px;top:3%}}
 }
+/* ─── INTRO BANNER ─── */
+.intro-banner{position:fixed;inset:0;z-index:99999;background:#070815;display:flex;align-items:center;justify-content:center;transition:transform 1.3s cubic-bezier(.77,0,.18,1);overflow:hidden}
+.intro-banner.hidden{transform:translateY(-100%)}
+.intro-canvas{position:absolute;inset:0;pointer-events:none}
+.intro-grid-wrap{position:absolute;bottom:0;left:0;width:100%;height:55%;perspective:600px;overflow:hidden;pointer-events:none}
+.intro-grid{position:absolute;bottom:-15%;left:-30%;width:160%;height:130%;transform-origin:bottom center;transform:rotateX(65deg)}
+.intro-grid-line{position:absolute;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(5,217,232,0.07),rgba(255,42,109,0.04),transparent);opacity:0;animation:gridLineIn 1.2s ease-out forwards}
+@keyframes gridLineIn{0%{opacity:0;transform:scaleX(0.4)}100%{opacity:1;transform:scaleX(1)}}
+.intro-sun{position:absolute;top:14%;left:50%;transform:translateX(-50%);width:400px;height:200px;border-radius:50%/100% 100% 0 0;background:linear-gradient(180deg,#ff2a6d 0%,#ff6b9d 18%,#ffce00 42%,transparent 75%);opacity:0;animation:sunRise 2s ease-out .3s forwards;pointer-events:none}
+.intro-sun::after{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0,0,0,0.15) 5px,rgba(0,0,0,0.15) 6px);animation:sunPulse 3s ease-in-out infinite}
+@keyframes sunRise{0%{opacity:0;transform:translateX(-50%) scaleY(0.2)}100%{opacity:0.85;transform:translateX(-50%) scaleY(1)}}
+@keyframes sunPulse{0%,100%{opacity:0.4}50%{opacity:1}}
+.intro-content{position:relative;z-index:10;text-align:center;opacity:0;animation:contentFade .8s ease .8s forwards}
+@keyframes contentFade{0%{opacity:0;transform:translateY(25px)}100%{opacity:1;transform:translateY(0)}}
+.intro-terminal{font-size:13px;font-family:'Courier New',monospace;color:var(--cyan);margin-bottom:22px;height:22px;letter-spacing:.02em;text-shadow:0 0 12px rgba(5,217,232,0.15);min-width:300px}
+.intro-cursor{display:inline-block;animation:cursorBlink .7s step-end infinite;color:var(--cyan);font-weight:100}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
+.intro-title{font-size:clamp(42px,8vw,82px);font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:6px;text-shadow:0 0 50px rgba(5,217,232,0.05)}
+.intro-title-accent{display:block;background:linear-gradient(135deg,#05d9e8 0%,#ffce00 50%,#ff2a6d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:clamp(32px,6vw,66px);letter-spacing:5px;position:relative}
+.intro-glitch{animation:glitch 3.5s ease-in-out 2.5s infinite}
+@keyframes glitch{0%,88%,100%{transform:translate(0);opacity:1}90%{transform:translate(-4px,2px);opacity:0.9;clip-path:inset(30% 0 25% 0)}92%{transform:translate(4px,-1px);opacity:0.85;clip-path:inset(10% 0 55% 0)}94%{transform:translate(-2px,3px);opacity:0.92;clip-path:inset(45% 0 15% 0)}96%{transform:translate(2px,-2px)}}
+.intro-sub{font-size:13px;color:var(--muted);margin-bottom:28px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+.intro-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 40px;border:1px solid rgba(5,217,232,0.2);border-radius:50px;background:rgba(5,217,232,0.03);color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:.12em;cursor:pointer;transition:all .35s;font-family:'Inter',sans-serif;text-transform:uppercase;opacity:0;animation:introBtnIn .8s ease 4.2s forwards}
+.intro-btn:hover{background:rgba(5,217,232,0.08);border-color:rgba(5,217,232,0.35);box-shadow:0 0 35px rgba(5,217,232,0.06),0 0 70px rgba(5,217,232,0.02);transform:scale(1.03)}
+.intro-btn:hover .intro-btn-arrow{transform:translateX(5px)}
+.intro-btn-arrow{display:inline-block;transition:transform .3s}
+@keyframes introBtnIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+.intro-hint{font-size:11px;color:var(--muted);margin-top:16px;opacity:0;animation:hintIn .8s ease 5s forwards}
+@keyframes hintIn{0%{opacity:0}100%{opacity:1}}
+.intro-hint span{color:var(--cyan);font-weight:700}
+.intro-airplane{position:absolute;top:25%;z-index:5;pointer-events:none;opacity:0;animation:planeFly 3.5s ease-in-out 1s forwards}
+@keyframes planeFly{0%{opacity:0;transform:translate(-100px,30px) rotate(-20deg) scale(0.5)}15%{opacity:1}50%{opacity:1}100%{opacity:0;transform:translate(calc(100vw + 100px),-100px) rotate(8deg) scale(0.9)}}
+.intro-airplane svg{width:72px;height:72px;filter:drop-shadow(0 0 50px rgba(5,217,232,0.35)) drop-shadow(0 0 100px rgba(255,42,109,0.15))}
+.intro-trail{position:absolute;top:50%;right:100%;width:200px;height:2px;background:linear-gradient(270deg,rgba(5,217,232,0.25),transparent)}
+.intro-vline{position:absolute;top:0;left:50%;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(5,217,232,0.03),transparent);pointer-events:none;opacity:0;animation:hlineIn 1.5s ease .5s forwards}
+@keyframes hlineIn{0%{opacity:0;transform:scaleY(0)}100%{opacity:1;transform:scaleY(1)}}
+
+@media(max-width:600px){
+  .intro-title{font-size:clamp(28px,10vw,46px)}
+  .intro-title-accent{font-size:clamp(22px,8vw,38px);letter-spacing:3px}
+  .intro-terminal{font-size:10px;min-width:auto}
+  .intro-sub{font-size:10px;letter-spacing:.1em;margin-bottom:22px}
+  .intro-btn{padding:12px 28px;font-size:11px}
+  .intro-sun{width:260px;height:130px;top:16%}
+  .intro-grid-wrap{height:45%}
+}
 </style>
 </head>
 <body>
+<!-- INTRO BANNER -->
+<div class="intro-banner" id="introBanner">
+  <canvas class="intro-canvas" id="introCanvas"></canvas>
+  <div class="intro-grid-wrap"><div class="intro-grid" id="introGrid"></div></div>
+  <div class="intro-sun"></div>
+  <div class="intro-vline"></div>
+  <div class="intro-airplane">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#ig)"/>
+      <line x1="43" y1="29" x2="52" y2="20" stroke="url(#ig)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+      <defs><linearGradient id="ig" x1="0" y1="0" x2="72" y2="72"><stop stop-color="#05d9e8"/><stop offset="0.5" stop-color="#ffce00"/><stop offset="1" stop-color="#ff2a6d"/></linearGradient></defs>
+    </svg>
+    <div class="intro-trail"></div>
+  </div>
+  <div class="intro-content">
+    <div class="intro-terminal"><span id="terminalText"></span><span class="intro-cursor">|</span></div>
+    <div class="intro-title">CLOUDNINE<span class="intro-title-accent intro-glitch">REWARDS</span></div>
+    <div class="intro-sub">Strategy Dashboard — Octopus Pipeline v2</div>
+    <button class="intro-btn" onclick="launchDashboard()"><span class="intro-btn-arrow">▶</span> Launch Control</button>
+    <div class="intro-hint">Auto-launching in <span id="introTimer">5</span>s</div>
+  </div>
+</div>
 <div class="bg-scan"></div>
 <div class="bg-orb"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 <div class="bg-sun"></div>
@@ -966,6 +1034,60 @@ function toggleDecision(el){
     });
     d.addEventListener('mouseleave', function(){ tip.classList.remove('show'); });
   });
+})();
+
+// ─── INTRO BANNER ───
+(function(){
+  var grid = document.getElementById('introGrid');
+  if(grid) for(var i = 0, L = 36; i < L; i++){
+    var ln = document.createElement('div');
+    ln.className = 'intro-grid-line';
+    var p = i / L;
+    ln.style.bottom = (p * p * 92) + '%';
+    ln.style.animationDelay = (p * 0.6) + 's';
+    ln.style.opacity = 1 - p * 0.8;
+    grid.appendChild(ln);
+  }
+})();
+(function(){
+  var el = document.getElementById('terminalText');
+  if(!el) return;
+  var txt = '> SYSTEM BOOT: OCTOPUS PIPELINE v2 — CLOUDNINE REWARDS', i = 0;
+  function ty(){ if(i < txt.length){ el.textContent += txt.charAt(i); i++; setTimeout(ty, 22 + Math.random()*28); } }
+  setTimeout(ty, 1100);
+})();
+(function(){
+  var el = document.getElementById('introTimer'), t = 5;
+  if(!el) return;
+  var iv = setInterval(function(){ t--; if(t <= 0){ clearInterval(iv); launchDashboard(); } else el.textContent = t; }, 1000);
+})();
+function launchDashboard(){
+  var b = document.getElementById('introBanner');
+  if(!b || b.classList.contains('hidden')) return;
+  b.classList.add('hidden');
+  setTimeout(function(){ b.style.display = 'none'; }, 1500);
+}
+(function(){
+  var c = document.getElementById('introCanvas');
+  if(!c) return;
+  var ctx = c.getContext('2d'), w, h, pts = [], n = 90;
+  function rs(){ w = c.width = c.parentElement.offsetWidth; h = c.height = c.parentElement.offsetHeight; }
+  rs();
+  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*2+0.3, dx:(Math.random()-0.5)*0.2, dy:(Math.random()-0.5)*0.2-0.04, o:Math.random()*0.4+0.06});
+  function dr(){
+    ctx.clearRect(0,0,w,h);
+    pts.forEach(function(p){
+      p.x += p.dx; p.y += p.dy;
+      if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
+      if(p.y < -20) p.y = h+20; if(p.y > h+20) p.y = -20;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = (p.y < h*0.35 ? 'rgba(255,42,109,' : 'rgba(5,217,232,') + p.o + ')';
+      ctx.fill();
+    });
+    requestAnimationFrame(dr);
+  }
+  dr();
+  window.addEventListener('resize', rs);
 })();
 </script>
 </body>
