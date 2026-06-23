@@ -65,15 +65,31 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#080c14;color:#e2e8
 /* ─── HERO ─── */
 .hero{position:relative;margin-bottom:32px;padding:60px 40px;text-align:center;overflow:hidden;border-radius:var(--radius);background:linear-gradient(135deg,rgba(17,25,39,0.8),rgba(26,35,50,0.4));border:1px solid rgba(255,255,255,0.04)}
 .hero-bg{position:absolute;top:0;left:0;width:100%;height:120%;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 30% 50%,rgba(245,158,11,0.06) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(59,130,246,0.06) 0%,transparent 60%)}
-.hero .inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
-.hero h2{font-size:clamp(28px,4vw,48px);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
-.hero h2 span{background:linear-gradient(135deg,var(--gold),var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:15px;color:var(--muted);max-width:520px;margin:0 auto 20px}
+.hero .inner{position:relative;z-index:2;max-width:720px;margin:0 auto}
+.hero h2{font-size:clamp(28px,4vw,48px);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.15;margin-bottom:12px}
+.hero h2 .line{display:block;animation:heroTextReveal .8s cubic-bezier(.22,1,.36,1) .4s both}
+.hero h2 .line:nth-child(2){animation-delay:.6s}
+@keyframes heroTextReveal{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
+.hero h2 .gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:15px;color:var(--muted);max-width:520px;margin:0 auto 20px;animation:heroFadeIn .8s ease .8s both}
+@keyframes heroFadeIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
 .hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
-.hero-stat{text-align:center}
+.hero-stat{text-align:center;opacity:0;animation:heroStatIn .6s ease both}
+.hero-stat:nth-child(1){animation-delay:1s}
+.hero-stat:nth-child(2){animation-delay:1.15s}
+.hero-stat:nth-child(3){animation-delay:1.3s}
+.hero-stat:nth-child(4){animation-delay:1.45s}
+@keyframes heroStatIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
 .hero-stat .num{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px}
 .hero-stat .num.gold{color:var(--gold)}.hero-stat .num.blue{color:var(--blue)}.hero-stat .num.green{color:var(--green)}
 .hero-stat .label{font-size:12px;color:var(--muted);margin-top:2px}
+.hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.6}
+.hero-glow{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;border-radius:var(--radius);opacity:0;animation:heroGlowPulse 4s ease-in-out 1.5s infinite}
+@keyframes heroGlowPulse{0%,100%{box-shadow:inset 0 0 60px rgba(245,158,11,0.03)}50%{box-shadow:inset 0 0 100px rgba(245,158,11,0.08)}}
+.hero-logo{width:64px;height:64px;margin:0 auto 16px;position:relative;z-index:2;animation:heroLogoEntrance 1s ease-out .2s both}
+.hero-logo svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(245,158,11,0.25))}
+@keyframes heroLogoEntrance{0%{opacity:0;transform:scale(0.4) rotate(-20deg)}60%{transform:scale(1.1) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
+.hero-badge{display:inline-block;margin-bottom:12px;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.12);color:var(--gold);animation:heroFadeIn .8s ease .3s both;z-index:2;position:relative}
 
 /* ─── SECTION REVEAL ─── */
 .section{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
@@ -274,6 +290,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#080c14;color:#e2e8
 @media(max-width:600px){
   .dashboard{padding:10px}
   .hero{padding:28px 16px;margin-bottom:16px}
+  .hero-logo{width:44px;height:44px;margin-bottom:10px}
+  .hero-badge{font-size:9px;padding:3px 10px;margin-bottom:8px}
   .hero-stats{gap:16px}
   .hero-stat .num{font-size:22px}
   .hero h2{font-size:clamp(22px,7vw,32px)}
@@ -396,9 +414,22 @@ Route-based, trip-purpose-based, party-based personalisation. Bundled pricing. L
 
   <!-- HERO -->
   <section class="hero" data-parallax="0.15">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
     <div class="hero-bg" data-parallax="0.08"></div>
+    <div class="hero-glow"></div>
     <div class="inner">
-      <h2>Experience &amp; Retention<br><span>Strategy Dashboard</span></h2>
+      <div class="hero-logo">
+        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="36" r="33" stroke="url(#hg)" stroke-width="1.2" fill="rgba(245,158,11,0.03)" stroke-dasharray="4 3"/>
+          <circle cx="36" cy="36" r="26" stroke="url(#hg)" stroke-width="0.8" fill="rgba(245,158,11,0.02)" stroke-dasharray="2 4"/>
+          <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#hg)"/>
+          <line x1="43" y1="29" x2="50" y2="22" stroke="url(#hg)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <circle cx="50" cy="22" r="2" fill="#f59e0b" opacity="0.4"/>
+          <defs><linearGradient id="hg" x1="0" y1="0" x2="72" y2="72"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>
+        </svg>
+      </div>
+      <div class="hero-badge">Octopus Pipeline v2</div>
+      <h2><span class="line">Experience &amp; Retention</span><span class="line gold">Strategy Dashboard</span></h2>
       <p>A connected three-part retention system to reduce loyalty dormancy, eliminate post-booking friction, and grow ancillary revenue — built for CloudNine's budget airline context.</p>
       <div class="hero-stats">
         <div class="hero-stat"><div class="num gold">4M</div><div class="label">Annual Passengers</div></div>
@@ -789,6 +820,29 @@ function exportPDF(){
     alert('PDF export failed. Try again.');
   });
 }
+
+// ─── HERO PARTICLES ───
+(function(){
+  var c = document.getElementById('heroCanvas');
+  if(!c) return;
+  var ctx = c.getContext('2d'), w, h, pts = [], n = 50;
+  function resize(){ w = c.width = c.parentElement.offsetWidth; h = c.height = c.parentElement.offsetHeight; }
+  resize();
+  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.8+0.3, dx:(Math.random()-0.5)*0.25, dy:(Math.random()-0.5)*0.25, o:Math.random()*0.5+0.08});
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    pts.forEach(function(p){
+      p.x += p.dx; p.y += p.dy;
+      if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
+      if(p.y < -10) p.y = h+10; if(p.y > h+10) p.y = -10;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(245,158,11,' + p.o + ')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize', resize);
+})();
 
 // ─── SCROLL TO TOP ───
 (function(){
