@@ -101,6 +101,7 @@ background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0
 .robot-wrap{position:fixed;bottom:36px;right:40px;z-index:15;pointer-events:none;opacity:0;animation:robotIn 1s ease 2s forwards;transform-origin:bottom center}
 @keyframes robotIn{0%{opacity:0;transform:translateY(30px) scale(0.8)}100%{opacity:1;transform:translateY(0) scale(1)}}
 .robot-wrap svg{width:85px;height:auto;filter:drop-shadow(0 0 30px rgba(5,217,232,0.06));transition:transform .35s ease-out}
+.robot-wrap{transition:transform .35s cubic-bezier(.25,.46,.45,.94)}
 
 .robot-reticle{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;display:flex;flex-direction:column;align-items:center;opacity:0;transition:opacity .4s}
 .robot-reticle.show{opacity:1}
@@ -128,10 +129,8 @@ background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0
 @keyframes rN{0%{transform:translateY(0)}25%{transform:translateY(6px) rotate(2deg)}60%{transform:translateY(-3px)}100%{transform:translateY(0)}}
 .robot-wrap.celebrate{animation:rC .6s cubic-bezier(.25,.46,.45,.94) 3}
 @keyframes rC{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-8px) rotate(-3deg)}75%{transform:translateY(-8px) rotate(3deg)}}
-.robot-wrap.lean{animation:rL .4s cubic-bezier(.25,.46,.45,.94) forwards}
-@keyframes rL{0%{transform:translateX(0)}100%{transform:translateX(8px)}}
-.robot-wrap.unlean{animation:rU .4s cubic-bezier(.25,.46,.45,.94) forwards}
-@keyframes rU{0%{transform:translateX(8px)}100%{transform:translateX(0)}}
+.robot-wrap.lean{transform:translateX(8px)}
+.robot-wrap.unlean{transform:translateX(0)}
 
 /* ─── CLICK RIPPLE ─── */
 .click-ring{position:fixed;border-radius:50%;border:1px solid rgba(5,217,232,0.1);pointer-events:none;z-index:99996;animation:ringExpand .9s ease-out forwards}
@@ -570,6 +569,15 @@ document.addEventListener('keydown', function(e){
       if(armR) armR.classList.remove('point');
     });
   }
+
+  // Prevent entrance animation from restarting when state classes are toggled
+  wrap.addEventListener('animationend', function(e){
+    if(e.animationName === 'robotIn'){
+      wrap.style.animation = 'none';
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'none';
+    }
+  });
 
   // Status starts after boot begins
   setTimeout(function(){ setRobotStatus('INITIALIZING'); }, 1500);
