@@ -13,19 +13,15 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#070815;color:#e0e0
 ::selection{background:rgba(255,206,0,0.25);color:#fff}
 :root{--cyan:#05d9e8;--gold:#ffce00;--pink:#ff2a6d;--muted:#8888bb}
 
-/* ─── CUSTOM CURSOR ─── */
 #cursorGlow{position:fixed;width:320px;height:320px;border-radius:50%;pointer-events:none;z-index:99998;background:radial-gradient(circle,rgba(5,217,232,0.05),transparent 65%);transform:translate(-50%,-50%);transition:opacity .4s ease}
 
-/* ─── PROGRESS BAR ─── */
 .progress-bar{position:fixed;top:0;left:0;width:100%;height:2px;z-index:20;background:rgba(5,217,232,0.05)}
 .progress-bar .fill{height:100%;width:0%;background:linear-gradient(90deg,#ff2a6d 0%,#ffce00 50%,#05d9e8 100%);animation:loadFill 3.2s cubic-bezier(.25,.46,.45,.94) forwards}
 @keyframes loadFill{0%{width:0%}100%{width:100%}}
 
-/* ─── BG SCANLINES ─── */
 @keyframes scanlines{0%{transform:translateY(0)}100%{transform:translateY(4px)}}
 .bg-scan{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);animation:scanlines .1s linear infinite;opacity:0.15}
 
-/* ─── BG ORBS ─── */
 .bg-orb{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
 .bg-orb .orb{position:absolute;border-radius:50%;filter:blur(120px)}
 .bg-orb .orb.o1{width:800px;height:800px;background:radial-gradient(circle,rgba(255,42,109,0.10),transparent);top:-300px;right:-200px;animation:float1 25s ease-in-out infinite}
@@ -35,53 +31,39 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#070815;color:#e0e0
 @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-80px,60px)}}
 @keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-40%,-60%) scale(1.4)}}
 
-/* ─── GRID ─── */
 .bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;
-background-image:
-  linear-gradient(0deg,rgba(5,217,232,0.05) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,42,109,0.03) 1px,transparent 1px);
-background-size:60px 60px}
+background-image:linear-gradient(0deg,rgba(5,217,232,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,42,109,0.03) 1px,transparent 1px);background-size:60px 60px}
 
-/* ─── SUN ─── */
 .bg-sun{position:fixed;top:6%;left:50%;transform:translateX(-50%);width:500px;height:250px;z-index:0;pointer-events:none;
 background:linear-gradient(180deg,rgba(255,42,109,0.05) 0%,rgba(255,206,0,0.03) 30%,transparent 75%);
 border-radius:50%/100% 100% 0 0;filter:blur(60px);opacity:0.5;animation:sunGlow 4s ease-in-out infinite}
 @keyframes sunGlow{0%,100%{opacity:0.45;filter:blur(60px)}50%{opacity:0.7;filter:blur(40px)}}
 
-/* ─── WRAPPER ─── */
 .wrapper{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10}
 
-/* ─── PERSPECTIVE GRID ─── */
 .grid-scene{position:fixed;bottom:0;left:0;width:100%;height:60%;z-index:1;perspective:600px;overflow:hidden;pointer-events:none;transition:transform .25s cubic-bezier(.25,.46,.45,.94)}
 .grid-scene .grid-stage{position:absolute;bottom:-20%;left:-15%;width:130%;height:130%;transform-origin:bottom center;transform:rotateX(65deg) translateZ(0)}
 .grid-scene .gln{position:absolute;left:0;width:100%;height:1px;opacity:0;animation:glIn 1.2s cubic-bezier(.25,.46,.45,.94) forwards}
 @keyframes glIn{0%{opacity:0;transform:scaleX(0.3)}100%{opacity:1;transform:scaleX(1)}}
 
-/* ─── RETRO SUN ─── */
 .sun-display{position:fixed;top:10%;left:50%;transform:translateX(-50%);width:360px;height:170px;border-radius:50%/100% 100% 0 0;z-index:2;pointer-events:none;opacity:0;animation:sunRise 2s cubic-bezier(.25,.46,.45,.94) .3s forwards}
 .sun-display::before{content:'';position:absolute;inset:0;border-radius:inherit;
-background:linear-gradient(180deg,#ff2a6d 0%,#ff6070 15%,#ff9a44 30%,#ffce00 45%,transparent 68%);
-opacity:0.8}
+background:linear-gradient(180deg,#ff2a6d 0%,#ff6070 15%,#ff9a44 30%,#ffce00 45%,transparent 68%);opacity:0.8}
 .sun-display::after{content:'';position:absolute;inset:0;border-radius:inherit;
-background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0,0,0,0.2) 5px,rgba(0,0,0,0.2) 6px);
-animation:sunPulse 3s ease-in-out infinite}
+background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0,0,0,0.2) 5px,rgba(0,0,0,0.2) 6px);animation:sunPulse 3s ease-in-out infinite}
 @keyframes sunRise{0%{opacity:0;transform:translateX(-50%) scaleY(0.15)}100%{opacity:1;transform:translateX(-50%) scaleY(1)}}
 @keyframes sunPulse{0%,100%{opacity:0.3}50%{opacity:1}}
 
-/* ─── CANVAS ─── */
 #particleCanvas{position:fixed;inset:0;z-index:3;pointer-events:none}
 
-/* ─── AIRPLANE ─── */
 .airplane{position:fixed;top:22%;z-index:4;pointer-events:none;opacity:0;animation:planeFly 4s cubic-bezier(.45,.05,.55,.95) .8s forwards}
 @keyframes planeFly{0%{opacity:0;transform:translate(-100px,30px) rotate(-22deg) scale(0.45)}10%{opacity:1}40%{opacity:1}100%{opacity:0;transform:translate(calc(100vw + 100px),-100px) rotate(12deg) scale(0.95)}}
 .airplane svg{width:80px;height:80px;filter:drop-shadow(0 0 50px rgba(5,217,232,0.35)) drop-shadow(0 0 100px rgba(255,42,109,0.12))}
 .airplane .trail{position:absolute;top:50%;right:100%;width:250px;height:2px;background:linear-gradient(270deg,rgba(5,217,232,0.15),transparent)}
 
-/* ─── CENTER STAGE ─── */
 .stage{position:relative;z-index:10;text-align:center;opacity:0;animation:stageIn 1s cubic-bezier(.25,.46,.45,.94) .6s forwards}
 @keyframes stageIn{0%{opacity:0;transform:translateY(25px)}100%{opacity:1;transform:translateY(0)}}
 
-/* ─── TERMINAL ─── */
 .terminal{font-size:14px;font-family:'Courier New',monospace;min-height:52px;margin-bottom:20px;letter-spacing:.01em;display:flex;flex-direction:column;align-items:center;gap:3px}
 .terminal .ln{opacity:0;animation:lnIn .3s ease forwards}
 .terminal .ln.ready{color:var(--cyan);text-shadow:0 0 12px rgba(5,217,232,0.1)}
@@ -91,7 +73,6 @@ animation:sunPulse 3s ease-in-out infinite}
 .terminal .cursor{display:inline-block;animation:blink .7s step-end infinite;color:var(--cyan);font-weight:100}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* ─── TITLE ─── */
 .title{font-family:'Orbitron',monospace;font-size:clamp(40px,7vw,74px);font-weight:900;color:#fff;letter-spacing:8px;line-height:1.1;margin-bottom:4px;opacity:0;animation:titleFade .8s ease-out .9s forwards}
 @keyframes titleFade{0%{opacity:0;letter-spacing:18px;filter:blur(4px)}100%{opacity:1;letter-spacing:8px;filter:blur(0)}}
 .title-accent{display:block;background:linear-gradient(135deg,#05d9e8 0%,#ffce00 50%,#ff2a6d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% 200%;background-position:0% 50%;font-size:clamp(32px,5.5vw,58px);letter-spacing:10px;position:relative;opacity:0;animation:neonReveal 1.4s ease-out 1.4s forwards}
@@ -101,7 +82,6 @@ animation:sunPulse 3s ease-in-out infinite}
 .sub{font-family:'Orbitron',monospace;font-size:clamp(9px,1.1vw,12px);color:var(--muted);margin-bottom:36px;letter-spacing:.35em;text-transform:uppercase;font-weight:400;opacity:0;animation:subFade .6s ease 1.8s forwards}
 @keyframes subFade{0%{opacity:0}100%{opacity:1}}
 
-/* ─── BUTTON ─── */
 .btn-wrap{position:relative;display:inline-block;opacity:0;animation:btnWrapIn .8s cubic-bezier(.25,.46,.45,.94) 4.5s forwards}
 @keyframes btnWrapIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
 .btn{display:inline-flex;align-items:center;gap:12px;padding:16px 44px;border:1px solid rgba(5,217,232,0.12);border-radius:50px;background:rgba(5,217,232,0.02);color:var(--cyan);font-size:13px;font-weight:600;letter-spacing:.15em;cursor:none;transition:all .4s cubic-bezier(.25,.46,.45,.94);font-family:'Orbitron',monospace;text-transform:uppercase;position:relative;overflow:hidden;user-select:none;outline:none;pointer-events:none;opacity:0.3}
@@ -117,24 +97,49 @@ animation:sunPulse 3s ease-in-out infinite}
 @keyframes hintIn{0%{opacity:0}100%{opacity:1}}
 .hint kbd{display:inline-block;padding:1px 7px;background:rgba(5,217,232,0.05);border:1px solid rgba(5,217,232,0.08);border-radius:3px;font-size:11px;font-family:'Inter',monospace;color:rgba(5,217,232,0.5)}
 
-/* ─── ROBOT OPERATOR ─── */
-.robot{position:fixed;bottom:40px;right:44px;z-index:15;pointer-events:none;opacity:0;animation:robotIn 1s ease 2s forwards;transform-origin:bottom center}
+/* ─── ROBOT ─── */
+.robot-wrap{position:fixed;bottom:36px;right:40px;z-index:15;pointer-events:none;opacity:0;animation:robotIn 1s ease 2s forwards;transform-origin:bottom center}
 @keyframes robotIn{0%{opacity:0;transform:translateY(30px) scale(0.8)}100%{opacity:1;transform:translateY(0) scale(1)}}
-.robot svg{width:90px;height:auto;filter:drop-shadow(0 0 30px rgba(5,217,232,0.08));transition:transform .35s ease-out}
+.robot-wrap svg{width:85px;height:auto;filter:drop-shadow(0 0 30px rgba(5,217,232,0.06));transition:transform .35s ease-out}
+
+.robot-reticle{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;display:flex;flex-direction:column;align-items:center;opacity:0;transition:opacity .4s}
+.robot-reticle.show{opacity:1}
+.robot-reticle .rt-text{font-family:'Courier New',monospace;font-size:9px;color:rgba(5,217,232,0.5);letter-spacing:.12em;white-space:nowrap;padding:3px 10px;border:1px solid rgba(5,217,232,0.08);border-radius:10px;background:rgba(5,217,232,0.03);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:rtPulse 2s ease-in-out infinite}
+@keyframes rtPulse{0%,100%{border-color:rgba(5,217,232,0.08)}50%{border-color:rgba(5,217,232,0.18)}}
+.robot-reticle .rt-tail{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid rgba(5,217,232,0.08);margin-top:-1px}
+
 .robot-head{transition:transform .3s cubic-bezier(.25,.46,.45,.94)}
 .robot-pupil{transition:transform .25s ease-out}
-.robot-chest-core{animation:chestPulse 2s ease-in-out infinite}
-@keyframes chestPulse{0%,100%{opacity:0.3}50%{opacity:0.9}}
-.robot-antenna-dot{animation:antennaPulse 1.2s ease-in-out infinite}
-@keyframes antennaPulse{0%,100%{opacity:0.4;filter:drop-shadow(0 0 2px rgba(255,42,109,0.3))}50%{opacity:1;filter:drop-shadow(0 0 8px rgba(255,42,109,0.6))}}
-.robot .mouth-glow{animation:mouthTalk 1.5s ease-in-out infinite;opacity:0.15}
-@keyframes mouthTalk{0%,100%{opacity:0.1}25%{opacity:0.35}75%{opacity:0.2}}
-.robot-body{animation:bodyBreathe 3s ease-in-out infinite;transform-origin:center bottom}
-@keyframes bodyBreathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.015)}}
-.robot.nod{animation:robotNod .5s cubic-bezier(.25,.46,.45,.94) forwards}
-@keyframes robotNod{0%{transform:translateY(0)}30%{transform:translateY(6px) rotate(2deg)}60%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.robot .rc{animation:rcP 2s ease-in-out infinite}
+@keyframes rcP{0%,100%{opacity:0.3}50%{opacity:0.9}}
+.robot .ra{animation:raP 1.2s ease-in-out infinite}
+@keyframes raP{0%,100%{opacity:0.4;filter:drop-shadow(0 0 2px rgba(255,42,109,0.3))}50%{opacity:1;filter:drop-shadow(0 0 8px rgba(255,42,109,0.6))}}
+.robot .rm{animation:rmT 1.5s ease-in-out infinite;opacity:0.12}
+@keyframes rmT{0%,100%{opacity:0.08}25%{opacity:0.3}75%{opacity:0.15}}
+.robot .rb{animation:rbB 3s ease-in-out infinite;transform-origin:center bottom}
+@keyframes rbB{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}
 
-/* ─── STATUS BAR ─── */
+.robot .arm-l{transform-origin:26px 86px;transition:transform .35s cubic-bezier(.25,.46,.45,.94)}
+.robot .arm-l.wave{transform:rotate(-35deg)}
+.robot .arm-r{transform-origin:74px 86px;transition:transform .35s cubic-bezier(.25,.46,.45,.94)}
+.robot .arm-r.point{transform:rotate(25deg)}
+
+.robot-wrap.nod{animation:rN .5s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rN{0%{transform:translateY(0)}25%{transform:translateY(6px) rotate(2deg)}60%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.robot-wrap.celebrate{animation:rC .6s cubic-bezier(.25,.46,.45,.94) 3}
+@keyframes rC{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-8px) rotate(-3deg)}75%{transform:translateY(-8px) rotate(3deg)}}
+.robot-wrap.lean{animation:rL .4s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rL{0%{transform:translateX(0)}100%{transform:translateX(8px)}}
+.robot-wrap.unlean{animation:rU .4s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rU{0%{transform:translateX(8px)}100%{transform:translateX(0)}}
+
+/* ─── CLICK RIPPLE ─── */
+.click-ring{position:fixed;border-radius:50%;border:1px solid rgba(5,217,232,0.1);pointer-events:none;z-index:99996;animation:ringExpand .9s ease-out forwards}
+@keyframes ringExpand{0%{width:0;height:0;opacity:1;transform:translate(-50%,-50%)}100%{width:400px;height:400px;opacity:0;transform:translate(-50%,-50%)}}
+.click-ring.pink{border-color:rgba(255,42,109,0.12)}
+.click-ring.gold{border-color:rgba(255,206,0,0.1)}
+
+/* ─── STATUS ─── */
 .status-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:20;font-size:11px;color:rgba(136,136,187,0.25);letter-spacing:.12em;font-family:'Courier New',monospace;opacity:0;animation:hintIn 1.5s ease 5.5s forwards}
 .status-bar .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(0,255,65,0.3);vertical-align:middle;margin-right:6px;animation:dotLive 1.5s ease-in-out infinite}
 @keyframes dotLive{0%,100%{opacity:0.3}50%{opacity:1}}
@@ -154,41 +159,24 @@ animation:sunPulse 3s ease-in-out infinite}
   #cursorGlow{display:none}
   .status-bar{font-size:10px;bottom:16px}
   .bg-grid{background-size:40px 40px}
-  .robot{bottom:16px;right:16px}
-  .robot svg{width:60px}
+  .robot-wrap{bottom:12px;right:12px}
+  .robot-wrap svg{width:55px}
+  .robot-reticle .rt-text{font-size:8px;padding:2px 8px}
 }
 </style>
 </head>
 <body>
 
-<!-- CURSOR GLOW -->
 <div id="cursorGlow"></div>
-
-<!-- PROGRESS BAR -->
 <div class="progress-bar"><div class="fill"></div></div>
-
-<!-- SCANLINES -->
 <div class="bg-scan"></div>
-
-<!-- ORBS -->
 <div class="bg-orb"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
-
-<!-- SUN -->
 <div class="bg-sun"></div>
-
-<!-- SYNTHWAVE GRID -->
 <div class="bg-grid"></div>
-
-<!-- PERSPECTIVE GRID SCENE -->
 <div class="grid-scene" id="gridScene"><div class="grid-stage" id="gridStage"></div></div>
-
-<!-- RETRO SUN -->
 <div class="sun-display" id="sunDisplay"></div>
-
-<!-- PARTICLES CANVAS -->
 <canvas id="particleCanvas"></canvas>
 
-<!-- AIRPLANE -->
 <div class="airplane" id="airplane">
   <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#ag)"/>
@@ -198,7 +186,6 @@ animation:sunPulse 3s ease-in-out infinite}
   <div class="trail"></div>
 </div>
 
-<!-- CENTER CONTENT -->
 <div class="wrapper">
   <div class="stage">
     <div class="terminal" id="terminal"></div>
@@ -211,35 +198,43 @@ animation:sunPulse 3s ease-in-out infinite}
   </div>
 </div>
 
-<!-- ROBOT OPERATOR -->
-<div class="robot" id="robot">
-  <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="50" y1="16" x2="50" y2="5" stroke="#05d9e8" stroke-width="1.3" stroke-linecap="round"/>
-    <circle cx="50" cy="4" r="3" fill="#ff2a6d" class="robot-antenna-dot"/>
-    <rect x="22" y="20" width="56" height="46" rx="8" stroke="#05d9e8" stroke-width="1.5" fill="rgba(5,217,232,0.03)" class="robot-head"/>
-    <rect x="24" y="22" width="52" height="42" rx="6" stroke="rgba(5,217,232,0.15)" stroke-width="0.5" fill="none"/>
-    <circle cx="20" cy="43" r="5" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.04)"/>
-    <circle cx="20" cy="43" r="1.5" fill="#05d9e8" opacity="0.4"/>
-    <circle cx="80" cy="43" r="5" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.04)"/>
-    <circle cx="80" cy="43" r="1.5" fill="#05d9e8" opacity="0.4"/>
-    <ellipse cx="50" cy="38" rx="14" ry="10" stroke="#ffce00" stroke-width="1.5" fill="rgba(255,206,0,0.05)" class="robot-eye-bg"/>
-    <circle cx="50" cy="38" r="5" fill="#ffce00" class="robot-pupil"/>
-    <g stroke="#05d9e8" stroke-width="1" opacity="0.3" class="mouth-glow">
-      <line x1="35" y1="54" x2="65" y2="54"/>
-      <line x1="38" y1="58" x2="62" y2="58"/>
-      <line x1="42" y1="62" x2="58" y2="62"/>
-    </g>
-    <rect x="44" y="66" width="12" height="8" rx="2" stroke="#05d9e8" stroke-width="1" fill="rgba(5,217,232,0.02)"/>
-    <rect x="26" y="74" width="48" height="38" rx="6" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.02)" class="robot-body"/>
-    <circle cx="50" cy="93" r="5" stroke="#ff2a6d" stroke-width="1.2" fill="rgba(255,42,109,0.06)"/>
-    <circle cx="50" cy="93" r="2.5" fill="#ff2a6d" class="robot-chest-core"/>
-    <g stroke="#05d9e8" stroke-width="1.2" stroke-linecap="round" opacity="0.5">
-      <line x1="26" y1="86" x2="14" y2="100"/>
-      <line x1="74" y1="86" x2="86" y2="100"/>
-      <circle cx="14" cy="100" r="3" fill="rgba(5,217,232,0.04)"/>
-      <circle cx="86" cy="100" r="3" fill="rgba(5,217,232,0.04)"/>
-    </g>
-  </svg>
+<!-- ROBOT -->
+<div class="robot-wrap" id="robotWrap">
+  <div class="robot-reticle" id="robotReticle">
+    <div class="rt-text" id="rtText">INITIALIZING</div>
+    <div class="rt-tail"></div>
+  </div>
+  <div class="robot" id="robot">
+    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="50" y1="16" x2="50" y2="5" stroke="#05d9e8" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="50" cy="4" r="3" fill="#ff2a6d" class="ra"/>
+      <rect x="22" y="20" width="56" height="46" rx="8" stroke="#05d9e8" stroke-width="1.5" fill="rgba(5,217,232,0.03)" class="robot-head"/>
+      <rect x="24" y="22" width="52" height="42" rx="6" stroke="rgba(5,217,232,0.15)" stroke-width="0.5" fill="none"/>
+      <circle cx="20" cy="43" r="5" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.04)"/>
+      <circle cx="20" cy="43" r="1.5" fill="#05d9e8" opacity="0.4"/>
+      <circle cx="80" cy="43" r="5" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.04)"/>
+      <circle cx="80" cy="43" r="1.5" fill="#05d9e8" opacity="0.4"/>
+      <ellipse cx="50" cy="38" rx="14" ry="10" stroke="#ffce00" stroke-width="1.5" fill="rgba(255,206,0,0.05)" class="robot-eye-bg"/>
+      <circle cx="50" cy="38" r="5" fill="#ffce00" class="robot-pupil"/>
+      <g stroke="#05d9e8" stroke-width="1" opacity="0.3" class="rm">
+        <line x1="35" y1="54" x2="65" y2="54"/>
+        <line x1="38" y1="58" x2="62" y2="58"/>
+        <line x1="42" y1="62" x2="58" y2="62"/>
+      </g>
+      <rect x="44" y="66" width="12" height="8" rx="2" stroke="#05d9e8" stroke-width="1" fill="rgba(5,217,232,0.02)"/>
+      <rect x="26" y="74" width="48" height="38" rx="6" stroke="#05d9e8" stroke-width="1.2" fill="rgba(5,217,232,0.02)" class="robot-body rb"/>
+      <circle cx="50" cy="93" r="5" stroke="#ff2a6d" stroke-width="1.2" fill="rgba(255,42,109,0.06)"/>
+      <circle cx="50" cy="93" r="2.5" fill="#ff2a6d" class="rc"/>
+      <g class="arm-l">
+        <line x1="26" y1="86" x2="14" y2="100" stroke="#05d9e8" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+        <circle cx="14" cy="100" r="3" fill="rgba(5,217,232,0.04)"/>
+      </g>
+      <g class="arm-r">
+        <line x1="74" y1="86" x2="86" y2="100" stroke="#05d9e8" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+        <circle cx="86" cy="100" r="3" fill="rgba(5,217,232,0.04)"/>
+      </g>
+    </svg>
+  </div>
 </div>
 
 <div class="status-bar"><span class="dot"></span>SYSTEM STANDBY — AWAITING INPUT</div>
@@ -255,7 +250,6 @@ animation:sunPulse 3s ease-in-out infinite}
     {text:'> ESTABLISHING SECURE CHANNEL — 128-bit AES', delay:3900, cls:'ln ready'},
     {text:'> ALL SYSTEMS NOMINAL', delay:4800, cls:'ln ok'},
   ];
-
   var cw = document.createElement('span');
   cw.className = 'cursor-wrap';
   var cur = document.createElement('span');
@@ -263,7 +257,6 @@ animation:sunPulse 3s ease-in-out infinite}
   cur.textContent = '|';
   cw.appendChild(cur);
   term.appendChild(cw);
-
   function addLn(data, idx){
     var d = document.createElement('div');
     d.className = data.cls;
@@ -272,13 +265,7 @@ animation:sunPulse 3s ease-in-out infinite}
     d.appendChild(span);
     term.insertBefore(d, cw);
     var txt = data.text, ci = 0;
-    function ty(){
-      if(ci < txt.length){
-        span.textContent += txt.charAt(ci);
-        ci++;
-        setTimeout(ty, 10 + Math.random() * 18);
-      }
-    }
+    function ty(){ if(ci < txt.length){ span.textContent += txt.charAt(ci); ci++; setTimeout(ty, 10+Math.random()*18); } }
     setTimeout(ty, 60);
     if(idx === lines.length - 1){
       setTimeout(function(){
@@ -287,24 +274,12 @@ animation:sunPulse 3s ease-in-out infinite}
         if(btn) btn.classList.add('active');
         var sb = document.querySelector('.status-bar');
         if(sb) sb.innerHTML = '<span class="dot" style="background:rgba(0,255,65,0.6)"></span>SYSTEM READY — CLICK TO PROCEED';
+        setRobotStatus('AWAITING INPUT');
       }, 600);
     }
   }
-  lines.forEach(function(data, idx){
-    setTimeout(function(){ addLn(data, idx); }, data.delay);
-  });
+  lines.forEach(function(data, idx){ setTimeout(function(){ addLn(data, idx); }, data.delay); });
 })();
-
-// ─── NAVIGATION ───
-function goDashboard(){ window.location.href = 'dashboard.html'; }
-
-// ─── KEYBOARD ───
-document.addEventListener('keydown', function(e){
-  if(e.key === 'Enter' || e.key === ' '){
-    var btn = document.getElementById('launchBtn');
-    if(btn && btn.classList.contains('active')){ e.preventDefault(); goDashboard(); }
-  }
-});
 
 // ─── PERSPECTIVE GRID ───
 (function(){
@@ -317,7 +292,7 @@ document.addEventListener('keydown', function(e){
     ln.style.bottom = (p * p * 90) + '%';
     ln.style.animationDelay = (p * 0.5) + 's';
     ln.style.opacity = Math.max(0.04, 1 - p * 0.85);
-    ln.style.background = 'linear-gradient(90deg,transparent,rgba(5,217,232,' + (0.03 + p * 0.04) + '),rgba(255,42,109,' + (0.015 + p * 0.02) + '),transparent)';
+    ln.style.background = 'linear-gradient(90deg,transparent,rgba(5,217,232,'+(0.03+p*0.04)+'),rgba(255,42,109,'+(0.015+p*0.02)+'),transparent)';
     gs.appendChild(ln);
   }
 })();
@@ -326,39 +301,103 @@ document.addEventListener('keydown', function(e){
 (function(){
   var c = document.getElementById('particleCanvas');
   if(!c) return;
-  var ctx = c.getContext('2d'), w, h, pts = [], n = 120, mx = -9999, my = -9999;
+  var ctx = c.getContext('2d'), w, h, pts = [], n = 110, mx = -9999, my = -9999;
+  var trail = [], trailLen = 20;
+
   function rs(){ w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
   rs(); window.addEventListener('resize', rs);
-  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3-0.05, r:Math.random()*2+0.4, o:Math.random()*0.3+0.06, bx:0, by:0});
+
+  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3-0.05,r:Math.random()*2+0.4,o:Math.random()*0.3+0.06,bx:0,by:0});
   pts.forEach(function(p){ p.bx = p.vx; p.by = p.vy; });
-  document.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; });
+
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX; my = e.clientY;
+    trail.push({x:mx, y:my, life:1});
+    if(trail.length > trailLen) trail.shift();
+  });
   document.addEventListener('mouseleave', function(){ mx = -9999; my = -9999; });
+
+  function burstParticles(x, y, count, color, speed){
+    for(var i = 0; i < count; i++){
+      var angle = Math.random() * Math.PI * 2;
+      var spd = speed * (0.3 + Math.random() * 0.7);
+      pts.push({x:x, y:y, vx:Math.cos(angle)*spd, vy:Math.sin(angle)*spd-0.5, r:Math.random()*2.5+0.5, o:Math.random()*0.5+0.2, bx:0, by:0, life:1, decay:0.008+Math.random()*0.012, color:color});
+    }
+  }
+  window.burstParticles = burstParticles;
+
   function dr(){
     ctx.clearRect(0,0,w,h);
-    pts.forEach(function(p){
+
+    // Trail
+    for(var i = 0; i < trail.length; i++){
+      var t = trail[i];
+      t.life = (i / trail.length);
+      var alpha = t.life * 0.12;
+      ctx.beginPath(); ctx.arc(t.x, t.y, 1.5 * t.life, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(5,217,232,'+alpha+')'; ctx.fill();
+    }
+
+    // Particles
+    for(var i = pts.length-1; i >= 0; i--){
+      var p = pts[i];
       var dx = p.x - mx, dy = p.y - my, d = Math.sqrt(dx*dx+dy*dy);
-      if(d < 150 && d > 0){ var f = (150-d)/150*0.5; p.vx += (dx/d)*f; p.vy += (dy/d)*f; }
-      p.vx += (p.bx-p.vx)*0.02; p.vy += (p.by-p.vy)*0.02;
+
+      if(d < 150 && d > 0 && p.life === undefined){ var f = (150-d)/150*0.5; p.vx += (dx/d)*f; p.vy += (dy/d)*f; }
+      if(p.bx !== undefined && p.life === undefined){
+        p.vx += (p.bx-p.vx)*0.02; p.vy += (p.by-p.vy)*0.02;
+      }
+
       p.x += p.vx; p.y += p.vy;
-      if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
-      if(p.y < -20) p.y = h+20; if(p.y > h+20) p.y = -20;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = (p.y < h*0.35 ? 'rgba(255,42,109,' : 'rgba(5,217,232,') + p.o + ')';
+
+      if(p.life !== undefined){
+        p.life -= p.decay || 0.01;
+        if(p.life <= 0){ pts.splice(i,1); continue; }
+      }
+
+      if(p.life === undefined){
+        if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
+        if(p.y < -20) p.y = h+20; if(p.y > h+20) p.y = -20;
+      }
+
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (p.life !== undefined ? p.life : 1), 0, Math.PI*2);
+      ctx.fillStyle = p.color || (p.y < h*0.35 ? 'rgba(255,42,109,' : 'rgba(5,217,232,') + (p.o * (p.life !== undefined ? p.life : 1)) + ')';
       ctx.fill();
-      if(d < 180 && d > 0){
-        var a = (180-d)/180*0.1;
+
+      if(d < 180 && d > 0 && p.life === undefined){
+        var a = (180-d)/180*0.08;
         ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(p.x,p.y);
         ctx.strokeStyle = 'rgba(5,217,232,'+a+')'; ctx.lineWidth = 0.5; ctx.stroke();
       }
-    });
+    }
     requestAnimationFrame(dr);
   }
   dr();
-  document.addEventListener('touchmove', function(e){ var t = e.touches[0]; mx = t.clientX; my = t.clientY; }, {passive:true});
+
+  document.addEventListener('touchmove', function(e){ var t = e.touches[0]; mx = t.clientX; my = t.clientY; trail.push({x:mx,y:my,life:1}); if(trail.length>trailLen) trail.shift(); }, {passive:true});
   document.addEventListener('touchend', function(){ mx = -9999; my = -9999; });
+
+  // Click burst
+  document.addEventListener('click', function(e){
+    burstParticles(e.clientX, e.clientY, 25, null, 1.2);
+    burstParticles(e.clientX, e.clientY, 12, 'rgba(255,206,0,', 1.8);
+  });
 })();
 
-// ─── MOUSE GRID TILT ───
+// ─── CLICK RIPPLE ───
+(function(){
+  var colors = ['','pink','gold'];
+  document.addEventListener('click', function(e){
+    var ring = document.createElement('div');
+    ring.className = 'click-ring ' + colors[Math.floor(Math.random()*colors.length)];
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+    document.body.appendChild(ring);
+    setTimeout(function(){ ring.remove(); }, 1000);
+  });
+})();
+
+// ─── GRID TILT ───
 (function(){
   var gs = document.getElementById('gridScene');
   if(!gs) return;
@@ -379,7 +418,17 @@ document.addEventListener('keydown', function(e){
   document.addEventListener('touchstart', function(){ cg.style.display = 'none'; });
 })();
 
-// ─── BUTTON RIPPLE ───
+// ─── NAVIGATION ───
+function goDashboard(){ window.location.href = 'dashboard.html'; }
+
+document.addEventListener('keydown', function(e){
+  if((e.key === 'Enter' || e.key === ' ')){
+    var btn = document.getElementById('launchBtn');
+    if(btn && btn.classList.contains('active')){ e.preventDefault(); goDashboard(); }
+  }
+});
+
+// ─── BUTTON ───
 (function(){
   var btn = document.getElementById('launchBtn');
   if(!btn) return;
@@ -398,7 +447,7 @@ document.addEventListener('keydown', function(e){
   btn.addEventListener('touchend', function(e){ e.preventDefault(); rip(e); });
 })();
 
-// ─── SUN SCANNER BANDS ───
+// ─── SUN ───
 (function(){
   var sun = document.getElementById('sunDisplay');
   if(!sun) return;
@@ -412,35 +461,85 @@ document.addEventListener('keydown', function(e){
 
 // ─── ROBOT ───
 (function(){
+  var wrap = document.getElementById('robotWrap');
   var robot = document.getElementById('robot');
-  if(!robot) return;
+  if(!robot || !wrap) return;
   var head = robot.querySelector('.robot-head');
   var pupil = robot.querySelector('.robot-pupil');
+  var eyeBg = robot.querySelector('.robot-eye-bg');
+  var armL = robot.querySelector('.arm-l');
+  var armR = robot.querySelector('.arm-r');
+  var reticle = document.getElementById('robotReticle');
+  var rtText = document.getElementById('rtText');
   var cx = window.innerWidth/2, cy = window.innerHeight/2;
-  var btn = document.getElementById('launchBtn');
-  var blink = true;
+  var statusMsgs = ['SCANNING', 'MONITORING', 'AWAITING INPUT', 'ALL SYSTEMS OK', 'STANDBY'];
+  var msgIdx = 0;
+  var proximity = false;
+
+  window.setRobotStatus = function(msg){
+    if(reticle) reticle.classList.add('show');
+    if(rtText) rtText.textContent = msg;
+  };
 
   window.addEventListener('resize', function(){ cx = window.innerWidth/2; cy = window.innerHeight/2; });
 
-  // Cursor tracking
+  // Cycle status messages after boot
+  var statusInterval = setInterval(function(){
+    var btn = document.getElementById('launchBtn');
+    if(btn && btn.classList.contains('active')){
+      msgIdx = (msgIdx + 1) % statusMsgs.length;
+      if(!proximity) setRobotStatus(statusMsgs[msgIdx]);
+    }
+  }, 4000);
+
+  // Cursor tracking + proximity
   document.addEventListener('mousemove', function(e){
     if(!head || !pupil) return;
     var rect = robot.getBoundingClientRect();
     var rx = rect.left + rect.width/2;
     var ry = rect.top + rect.height/2;
+
     var dx = (e.clientX - rx) / rx;
     var dy = (e.clientY - ry) / ry;
     var angle = Math.atan2(e.clientY - ry, e.clientX - rx);
     var dist = Math.min(1, Math.sqrt(dx*dx + dy*dy) * 1.5);
+
     head.style.transform = 'rotate(' + (Math.sin(angle) * dist * 6) + 'deg) translateY(' + (Math.abs(Math.cos(angle)) * dist * -2) + 'px)';
     pupil.setAttribute('cx', 50 + Math.sin(angle) * dist * 5);
     pupil.setAttribute('cy', 38 + Math.cos(angle) * dist * 2.5);
+
+    // Proximity: cursor near robot
+    var cursorDist = Math.sqrt(
+      Math.pow(e.clientX - (rect.left + rect.width/2), 2) +
+      Math.pow(e.clientY - (rect.top + rect.height/3), 2)
+    );
+    if(cursorDist < 150 && !proximity){
+      proximity = true;
+      wrap.classList.remove('unlean');
+      wrap.classList.add('lean');
+      setRobotStatus('👀 DETECTED');
+      // Fast blink
+      if(eyeBg){
+        eyeBg.setAttribute('ry', '1');
+        pupil.setAttribute('opacity', '0');
+        setTimeout(function(){ eyeBg.setAttribute('ry', '10'); pupil.setAttribute('opacity', '1'); }, 80);
+        setTimeout(function(){
+          eyeBg.setAttribute('ry', '1');
+          pupil.setAttribute('opacity', '0');
+          setTimeout(function(){ eyeBg.setAttribute('ry', '10'); pupil.setAttribute('opacity', '1'); }, 80);
+        }, 200);
+      }
+    } else if(cursorDist >= 150 && proximity){
+      proximity = false;
+      wrap.classList.remove('lean');
+      wrap.classList.add('unlean');
+      setRobotStatus(statusMsgs[msgIdx]);
+    }
   });
 
   // Blink
-  var eyeBg = robot.querySelector('.robot-eye-bg');
   setInterval(function(){
-    if(eyeBg){
+    if(eyeBg && !proximity){
       eyeBg.setAttribute('ry', '1');
       pupil.setAttribute('opacity', '0');
       setTimeout(function(){
@@ -450,15 +549,32 @@ document.addEventListener('keydown', function(e){
     }
   }, 3500 + Math.random() * 2000);
 
-  // Button hover reaction
+  // Random arm wave
+  setInterval(function(){
+    if(!armL) return;
+    armL.classList.add('wave');
+    setTimeout(function(){ armL.classList.remove('wave'); }, 600);
+  }, 7000 + Math.random() * 4000);
+
+  // Button hover → nod + point
+  var btn = document.getElementById('launchBtn');
   if(btn){
     btn.addEventListener('mouseenter', function(){
-      if(btn.classList.contains('active')) robot.classList.add('nod');
+      if(btn.classList.contains('active')){
+        wrap.classList.add('nod');
+        if(armR) armR.classList.add('point');
+      }
     });
-    btn.addEventListener('animationend', function(){
-      robot.classList.remove('nod');
+    btn.addEventListener('mouseleave', function(){
+      wrap.classList.remove('nod');
+      if(armR) armR.classList.remove('point');
     });
   }
+
+  // Status starts after boot begins
+  setTimeout(function(){ setRobotStatus('INITIALIZING'); }, 1500);
+  setTimeout(function(){ setRobotStatus('LOADING MODULES'); }, 2800);
+  setTimeout(function(){ setRobotStatus('ESTABLISHING LINK'); }, 3900);
 })();
 </script>
 </body>
