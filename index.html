@@ -3,1091 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudNine Rewards — Strategy Dashboard</title>
+<title>CloudNine Rewards — Interactive Briefing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden}
+body{font-family:'Inter',-apple-system,sans-serif;background:#070815;color:#e0e0ff;line-height:1.5;overflow:hidden;height:100vh;cursor:none}
 ::selection{background:rgba(255,206,0,0.3);color:#fff}
-a{color:var(--cyan);text-decoration:none}a:hover{color:var(--gold)}
-:root{--bg:#0a0b1a;--surface:#12142d;--surface2:#1a1d3a;--border:#2a2d5a;--gold:#ffce00;--gold-dim:#e6a800;--green:#00ff41;--red:#ff2a6d;--blue:#05d9e8;--purple:#7000ff;--pink:#ff2a6d;--cyan:#05d9e8;--text:#e0e0ff;--muted:#8888bb;--radius:16px;--transition:.3s}
-/* ─── SCANLINES ─── */
+:root{--cyan:#05d9e8;--gold:#ffce00;--pink:#ff2a6d;--muted:#8888bb}
+
+/* ─── CUSTOM CURSOR ─── */
+#cursorGlow{position:fixed;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:99998;background:radial-gradient(circle,rgba(5,217,232,0.06),transparent 70%);transform:translate(-50%,-50%);transition:opacity .3s}
+
+/* ─── BG SCANLINES ─── */
 @keyframes scanlines{0%{transform:translateY(0)}100%{transform:translateY(4px)}}
-.bg-scan{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);animation:scanlines 0.1s linear infinite;opacity:0.3}
+.bg-scan{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);animation:scanlines .1s linear infinite;opacity:0.2}
 
-/* ─── BG ─── */
+/* ─── BG ORBS ─── */
 .bg-orb{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
-.bg-orb .orb{position:absolute;border-radius:50%;filter:blur(100px)}
-.bg-orb .orb.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(255,42,109,0.15),transparent);top:-200px;right:-300px;animation:float1 25s ease-in-out infinite}
-.bg-orb .orb.o2{width:600px;height:600px;background:radial-gradient(circle,rgba(5,217,232,0.1),transparent);bottom:-200px;left:-200px;animation:float2 30s ease-in-out infinite}
-.bg-orb .orb.o3{width:400px;height:400px;background:radial-gradient(circle,rgba(112,0,255,0.08),transparent);top:40%;left:60%;animation:float3 20s ease-in-out infinite}
-@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-80px)}}
-@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,50px)}}
-@keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-40%,-70%) scale(1.3)}}
+.bg-orb .orb{position:absolute;border-radius:50%;filter:blur(120px)}
+.bg-orb .orb.o1{width:800px;height:800px;background:radial-gradient(circle,rgba(255,42,109,0.12),transparent);top:-300px;right:-200px;animation:float1 25s ease-in-out infinite}
+.bg-orb .orb.o2{width:600px;height:600px;background:radial-gradient(circle,rgba(5,217,232,0.08),transparent);bottom:-250px;left:-250px;animation:float2 30s ease-in-out infinite}
+.bg-orb .orb.o3{width:400px;height:400px;background:radial-gradient(circle,rgba(255,206,0,0.05),transparent);top:50%;left:60%;animation:float3 20s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(80px,-100px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-80px,60px)}}
+@keyframes float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-40%,-60%) scale(1.4)}}
 
-/* ─── SYNTHWAVE GRID ─── */
+/* ─── GRID ─── */
 .bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;
 background-image:
-  linear-gradient(0deg,rgba(5,217,232,0.04) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,42,109,0.03) 1px,transparent 1px);
-background-size:80px 80px}
-/* ─── RETRO SUN (subtle) ─── */
-.bg-sun{position:fixed;top:5%;left:50%;transform:translateX(-50%);width:600px;height:300px;z-index:0;pointer-events:none;
-background:linear-gradient(180deg,rgba(255,206,0,0.04) 0%,rgba(255,42,109,0.02) 40%,transparent 100%);
-border-radius:50%/100% 100% 0 0;filter:blur(40px);opacity:0.5}
+  linear-gradient(0deg,rgba(5,217,232,0.06) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,42,109,0.04) 1px,transparent 1px);
+background-size:60px 60px}
 
-.dashboard{max-width:1240px;margin:0 auto;padding:20px;position:relative;z-index:1}
+/* ─── SUN ─── */
+.bg-sun{position:fixed;top:6%;left:50%;transform:translateX(-50%);width:500px;height:250px;z-index:0;pointer-events:none;
+background:linear-gradient(180deg,rgba(255,42,109,0.06) 0%,rgba(255,206,0,0.04) 30%,transparent 75%);
+border-radius:50%/100% 100% 0 0;filter:blur(60px);opacity:0.6;animation:sunGlow 4s ease-in-out infinite}
+@keyframes sunGlow{0%,100%{opacity:0.5;filter:blur(60px)}50%{opacity:0.8;filter:blur(40px)}}
 
-/* ─── SYNTHETIC DATA BANNER ─── */
-.synth-banner{display:flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(255,206,0,0.04);border:1px solid rgba(255,206,0,0.08);border-radius:10px;margin-bottom:20px;font-size:12px;color:var(--muted)}
-.synth-banner .badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:rgba(255,206,0,0.08);color:var(--gold)}
-.synth-banner strong{color:#fff}
+/* ─── INTRO CONTENT ─── */
+.wrapper{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10}
 
-/* ─── TOP BAR ─── */
-.top-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px;padding:14px 20px;background:rgba(10,11,26,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--radius);border:1px solid rgba(5,217,232,0.15);box-shadow:0 0 30px rgba(5,217,232,0.03)}
-.top-bar-left{display:flex;align-items:center;gap:14px}
-.top-bar-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#000;box-shadow:0 0 20px rgba(5,217,232,0.2)}
-.top-bar h1{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px}
-.top-bar h1 span{color:var(--gold)}
-.top-bar-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.top-bar-meta .badge{font-size:11px;color:var(--muted);padding:4px 10px;background:rgba(255,255,255,0.03);border-radius:20px;border:1px solid rgba(5,217,232,0.08)}
+/* ─── PERSPECTIVE GRID ─── */
+.grid-scene{position:fixed;bottom:0;left:0;width:100%;height:60%;z-index:1;perspective:600px;overflow:hidden;pointer-events:none;transition:transform .2s ease-out}
+.grid-scene .grid-stage{position:absolute;bottom:-20%;left:-15%;width:130%;height:130%;transform-origin:bottom center;transform:rotateX(65deg) translateZ(0)}
+.grid-scene .gln{position:absolute;left:0;width:100%;height:1px;opacity:0;animation:glIn 1.2s ease-out forwards}
+@keyframes glIn{0%{opacity:0;transform:scaleX(0.3)}100%{opacity:1;transform:scaleX(1)}}
 
-/* ─── AGENT OUTPUT TABS ─── */
-.tab-bar{display:flex;gap:4px;margin-bottom:24px;background:rgba(10,11,26,0.6);border-radius:12px;padding:4px;border:1px solid rgba(5,217,232,0.08)}
-.tab-btn{padding:10px 18px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif;background:transparent;color:var(--muted);flex:1;text-align:center}
-.tab-btn:hover{color:var(--cyan);background:rgba(5,217,232,0.06)}
-.tab-btn.active{background:rgba(255,42,109,0.15);color:var(--pink);box-shadow:inset 0 0 20px rgba(255,42,109,0.05)}
-.tab-panel{display:none;margin-bottom:24px;animation:tabFade .35s ease}
-.tab-panel.active{display:block}
-@keyframes tabFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.pdf-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,11,26,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.pdf-overlay.show{display:flex}
-.pdf-overlay .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.pdf-overlay .pt{font-size:14px;color:#fff;font-weight:600}
-.pdf-overlay .ps{font-size:12px;color:var(--muted)}
-.agent-output{background:rgba(10,11,26,0.5);border:1px solid rgba(5,217,232,0.06);border-radius:12px;padding:20px;font-size:13px;line-height:1.7;max-height:300px;overflow-y:auto;white-space:pre-wrap;color:#9999cc}
-.agent-output strong{color:#fff}
-.agent-output h3{color:var(--gold);font-size:14px;margin:12px 0 6px;text-shadow:0 0 20px rgba(255,206,0,0.15)}
-.agent-output h4{color:var(--text);font-size:13px;margin:8px 0 4px}
-.agent-output .handoff{display:block;margin-top:12px;padding:10px 14px;background:rgba(255,206,0,0.04);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:12px;color:var(--muted)}
+/* ─── RETRO SUN DISPLAY ─── */
+.sun-display{position:fixed;top:10%;left:50%;transform:translateX(-50%);width:360px;height:170px;border-radius:50%/100% 100% 0 0;z-index:2;pointer-events:none;opacity:0;animation:sunRise 2s ease-out .3s forwards}
+.sun-display::before{content:'';position:absolute;inset:0;border-radius:inherit;
+background:linear-gradient(180deg,#ff2a6d 0%,#ff6070 15%,#ff9a44 30%,#ffce00 45%,transparent 70%);
+opacity:0.85}
+.sun-display::after{content:'';position:absolute;inset:0;border-radius:inherit;
+background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0,0,0,0.18) 5px,rgba(0,0,0,0.18) 6px);
+animation:sunPulse 3s ease-in-out infinite}
+@keyframes sunRise{0%{opacity:0;transform:translateX(-50%) scaleY(0.15)}100%{opacity:1;transform:translateX(-50%) scaleY(1)}}
+@keyframes sunPulse{0%,100%{opacity:0.35}50%{opacity:1}}
 
-/* ─── HERO ─── */
-.hero{position:relative;margin-bottom:32px;padding:60px 40px;text-align:center;overflow:hidden;border-radius:var(--radius);background:linear-gradient(180deg,rgba(10,11,26,0.9),rgba(18,20,45,0.6));border:1px solid rgba(5,217,232,0.1)}
-.hero::before{content:'';position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--pink),transparent)}
-.hero-bg{position:absolute;top:0;left:0;width:100%;height:120%;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 30% 50%,rgba(255,42,109,0.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(5,217,232,0.06) 0%,transparent 60%)}
-.hero .inner{position:relative;z-index:2;max-width:720px;margin:0 auto}
-.hero h2{font-size:clamp(28px,4vw,48px);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.15;margin-bottom:12px;text-shadow:0 0 40px rgba(5,217,232,0.08)}
-.hero h2 .line{display:block;animation:heroTextReveal .8s cubic-bezier(.22,1,.36,1) .4s both}
-.hero h2 .line:nth-child(2){animation-delay:.6s}
-@keyframes heroTextReveal{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
-.hero h2 .gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none}
-.hero p{font-size:15px;color:var(--muted);max-width:520px;margin:0 auto 20px;animation:heroFadeIn .8s ease .8s both}
-@keyframes heroFadeIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
-.hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
-.hero-stat{text-align:center;opacity:0;animation:heroStatIn .6s ease both}
-.hero-stat:nth-child(1){animation-delay:1s}
-.hero-stat:nth-child(2){animation-delay:1.15s}
-.hero-stat:nth-child(3){animation-delay:1.3s}
-.hero-stat:nth-child(4){animation-delay:1.45s}
-@keyframes heroStatIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
-.hero-stat .num{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px}
-.hero-stat .num.gold{color:var(--gold);text-shadow:0 0 20px rgba(255,206,0,0.3)}
-.hero-stat .num.blue{color:var(--cyan);text-shadow:0 0 20px rgba(5,217,232,0.3)}
-.hero-stat .num.green{color:var(--green);text-shadow:0 0 20px rgba(0,255,65,0.3)}
-.hero-stat .label{font-size:12px;color:var(--muted);margin-top:2px}
-.hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.6}
-.hero-glow{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;border-radius:var(--radius);opacity:0;animation:heroGlowPulse 4s ease-in-out 1.5s infinite}
-@keyframes heroGlowPulse{0%,100%{box-shadow:inset 0 0 60px rgba(5,217,232,0.03)}50%{box-shadow:inset 0 0 100px rgba(5,217,232,0.07),inset 0 0 150px rgba(255,42,109,0.03)}}
-.hero-logo{width:64px;height:64px;margin:0 auto 16px;position:relative;z-index:2;animation:heroLogoEntrance 1s ease-out .2s both}
-.hero-logo svg{width:100%;height:100%;filter:drop-shadow(0 0 30px rgba(5,217,232,0.3)) drop-shadow(0 0 60px rgba(255,42,109,0.1))}
-@keyframes heroLogoEntrance{0%{opacity:0;transform:scale(0.4) rotate(-20deg)}60%{transform:scale(1.1) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
-.hero-badge{display:inline-block;margin-bottom:12px;padding:4px 14px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:rgba(255,42,109,0.08);border:1px solid rgba(255,42,109,0.15);color:var(--pink);animation:heroFadeIn .8s ease .3s both;z-index:2;position:relative}
+/* ─── CANVAS ─── */
+#particleCanvas{position:fixed;inset:0;z-index:3;pointer-events:none}
 
-/* ─── SECTION REVEAL ─── */
-.section{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
-.section.visible{opacity:1;transform:translateY(0)}
+/* ─── AIRPLANE ─── */
+.airplane{position:fixed;top:22%;z-index:4;pointer-events:none;opacity:0;animation:planeFly 4s ease-in-out .8s forwards}
+@keyframes planeFly{0%{opacity:0;transform:translate(-120px,40px) rotate(-25deg) scale(0.4)}12%{opacity:1}45%{opacity:1}100%{opacity:0;transform:translate(calc(100vw + 120px),-120px) rotate(10deg) scale(0.95)}}
+.airplane svg{width:80px;height:80px;filter:drop-shadow(0 0 60px rgba(5,217,232,0.4)) drop-shadow(0 0 120px rgba(255,42,109,0.15))}
+.airplane .trail{position:absolute;top:50%;right:100%;width:250px;height:2px;background:linear-gradient(270deg,rgba(5,217,232,0.2),transparent)}
 
-/* ─── GLASS ─── */
-.glass{background:rgba(10,11,26,0.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(5,217,232,0.06);border-radius:var(--radius);padding:24px;transition:var(--transition);margin-bottom:20px;box-shadow:0 4px 30px rgba(0,0,0,0.3)}
-.glass:hover{border-color:rgba(5,217,232,0.12);box-shadow:0 4px 30px rgba(5,217,232,0.03)}
-.glass-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.03em;text-shadow:0 0 20px rgba(5,217,232,0.06)}
-.glass-title .icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
-.glass-title .icon.ic-gold{background:rgba(255,206,0,0.1);color:var(--gold);box-shadow:0 0 10px rgba(255,206,0,0.06)}
-.glass-title .icon.ic-blue{background:rgba(5,217,232,0.1);color:var(--cyan);box-shadow:0 0 10px rgba(5,217,232,0.06)}
-.glass-title .icon.ic-green{background:rgba(0,255,65,0.1);color:var(--green);box-shadow:0 0 10px rgba(0,255,65,0.06)}
-.glass-title .icon.ic-purple{background:rgba(112,0,255,0.1);color:#a855f7;box-shadow:0 0 10px rgba(112,0,255,0.06)}
-.glass-title .icon.ic-pink{background:rgba(255,42,109,0.1);color:var(--pink);box-shadow:0 0 10px rgba(255,42,109,0.06)}
-.glass-title .icon.ic-cyan{background:rgba(5,217,232,0.1);color:var(--cyan);box-shadow:0 0 10px rgba(5,217,232,0.06)}
+/* ─── CENTER STAGE ─── */
+.stage{position:relative;z-index:10;text-align:center;opacity:0;animation:stageIn 1s ease .7s forwards}
+@keyframes stageIn{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+.terminal{font-size:14px;font-family:'Courier New',monospace;color:var(--cyan);margin-bottom:24px;height:24px;letter-spacing:.02em;text-shadow:0 0 15px rgba(5,217,232,0.12)}
+.cursor{display:inline-block;animation:blink .7s step-end infinite;color:var(--cyan);font-weight:100}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.title{font-size:clamp(44px,8vw,80px);font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:4px;text-shadow:0 0 40px rgba(5,217,232,0.04)}
+.title-accent{display:block;background:linear-gradient(135deg,#05d9e8 0%,#ffce00 50%,#ff2a6d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:clamp(34px,6vw,64px);letter-spacing:6px;position:relative}
+.title-accent.glitch{animation:glitch 3.5s ease-in-out 2.2s infinite}
+@keyframes glitch{0%,88%,100%{transform:translate(0);opacity:1}90%{transform:translate(-5px,2px);opacity:0.88;clip-path:inset(30% 0 25% 0)}92%{transform:translate(5px,-1px);opacity:0.82;clip-path:inset(10% 0 55% 0)}94%{transform:translate(-3px,3px);opacity:0.9;clip-path:inset(45% 0 15% 0)}96%{transform:translate(3px,-2px)}}
+.sub{font-size:13px;color:var(--muted);margin-bottom:32px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
 
-/* ─── AGENT FLOW VISUALISER ─── */
-.flow-wrap{overflow-x:auto;padding:10px 0}
-.flow{display:flex;align-items:center;justify-content:center;gap:0;min-width:560px}
-.flow-node{text-align:center;cursor:pointer;position:relative;flex-shrink:0}
-.flow-node .circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-weight:800;font-size:13px;color:#000;transition:all .35s;position:relative;border:2px solid transparent}
-.flow-node .circle .ripple{position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid;opacity:0;animation:ripplePulse 2s ease-out infinite;pointer-events:none}
-@keyframes ripplePulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.6);opacity:0}}
-.flow-node:hover .circle{transform:scale(1.1)}
-.flow-node.active .circle{transform:scale(1.08)}
-.flow-node .label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.flow-node .sub{font-size:9px;color:var(--muted);margin-top:1px}
-.flow-arrow{flex-shrink:0;margin:0 8px;margin-bottom:20px;color:var(--cyan);font-size:18px;opacity:.4}
-.fl-res .circle{background:linear-gradient(135deg,#eab308,#f59e0b);box-shadow:0 0 25px rgba(234,179,8,.4),0 0 60px rgba(234,179,8,.1)}.fl-res.active .circle{border-color:#eab308;box-shadow:0 0 35px rgba(234,179,8,.5),0 0 80px rgba(234,179,8,.15)}
-.fl-des .circle{background:linear-gradient(135deg,#ff2a6d,#ff6b9d);box-shadow:0 0 25px rgba(255,42,109,.4),0 0 60px rgba(255,42,109,.1)}.fl-des.active .circle{border-color:#ff2a6d;box-shadow:0 0 35px rgba(255,42,109,.5),0 0 80px rgba(255,42,109,.15)}
-.fl-com .circle{background:linear-gradient(135deg,#05d9e8,#00b4d8);box-shadow:0 0 25px rgba(5,217,232,.4),0 0 60px rgba(5,217,232,.1)}.fl-com.active .circle{border-color:#05d9e8;box-shadow:0 0 35px rgba(5,217,232,.5),0 0 80px rgba(5,217,232,.15)}
-.flow-detail{display:none;margin-top:16px;padding:16px 18px;background:rgba(10,11,26,0.4);border-radius:10px;font-size:12px;line-height:1.6;color:#9999cc;border-left:3px solid var(--gold);max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease}
-.flow-detail.open{display:block;max-height:600px;padding:16px 18px}
-.flow-detail strong{color:#fff}
-.flow-detail .tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-right:4px}
-.flow-detail .tag.res{background:rgba(234,179,8,.15);color:#eab308}
-.flow-detail .tag.des{background:rgba(255,42,109,.15);color:#ff6b9d}
-.flow-detail .tag.com{background:rgba(5,217,232,.15);color:#05d9e8}
-
-/* ─── KPI GRID ─── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px}
-.kpi-card{background:rgba(10,11,26,0.5);border-radius:var(--radius);padding:20px;border:1px solid rgba(5,217,232,0.06);transition:var(--transition);position:relative;overflow:hidden}
-.kpi-card:hover{transform:translateY(-3px);border-color:rgba(255,42,109,0.15);box-shadow:0 8px 30px rgba(255,42,109,0.05)}
-.export-btn{font-size:11px;font-weight:700;padding:7px 16px;border:none;border-radius:8px;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif;background:rgba(5,217,232,0.1);color:var(--cyan);box-shadow:0 0 10px rgba(5,217,232,0.05)}.export-btn:hover{background:rgba(5,217,232,0.18);transform:translateY(-1px);box-shadow:0 0 20px rgba(5,217,232,0.1)}.export-btn:disabled{opacity:.5;cursor:wait}
-.scroll-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:rgba(10,11,26,0.85);backdrop-filter:blur(12px);color:var(--cyan);font-size:18px;z-index:100;opacity:0;transform:translateY(12px);transition:all .3s;box-shadow:0 4px 16px rgba(5,217,232,0.08);display:flex;align-items:center;justify-content:center;border:1px solid rgba(5,217,232,0.1)}.scroll-top.show{opacity:1;transform:translateY(0)}.scroll-top:hover{background:rgba(5,217,232,0.1);box-shadow:0 4px 20px rgba(5,217,232,0.15)}
-.kpi-card .glow{position:absolute;top:-50%;right:-50%;width:100%;height:100%;background:radial-gradient(circle,rgba(255,42,109,0.03),transparent 70%);pointer-events:none}
-.kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;position:relative;z-index:1}
-.kpi-main{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;position:relative;z-index:1}
-.kpi-current{font-size:30px;font-weight:900;color:#fff;letter-spacing:-.5px;text-shadow:0 0 20px rgba(255,255,255,0.04)}
-.kpi-target{font-size:12px;color:var(--muted)}
-.kpi-target span{color:var(--gold);font-weight:700}
-.kpi-bar{height:5px;background:rgba(255,255,255,0.04);border-radius:4px;margin-bottom:8px;overflow:hidden;position:relative;z-index:1}
-.kpi-bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
-.kpi-bar-fill.critical{background:linear-gradient(90deg,var(--red),#cc1155)}
-.kpi-bar-fill.warning{background:linear-gradient(90deg,var(--gold),var(--gold-dim))}
-.kpi-bar-fill.success{background:linear-gradient(90deg,var(--green),#00cc33)}
-.kpi-bar-fill.na{background:linear-gradient(90deg,#5555aa,#333366)}
-.kpi-detail{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);position:relative;z-index:1}
-.kpi-detail .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
-.kpi-detail .tag.danger{background:rgba(255,42,109,0.12);color:var(--red)}
-.kpi-detail .tag.warn{background:rgba(255,206,0,0.1);color:var(--gold)}
-.kpi-detail .tag.ok{background:rgba(0,255,65,0.1);color:var(--green)}
-.kpi-detail .tag.na{background:rgba(85,85,170,0.12);color:#7777bb}
-
-/* ─── TWO-COL ─── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-@media(max-width:860px){.two-col{grid-template-columns:1fr}}
-
-/* ─── PHASES ─── */
-.phase-list{display:flex;flex-direction:column;gap:10px}
-.phase{display:grid;grid-template-columns:80px 1fr 80px;gap:12px;align-items:center;padding:14px 16px;background:rgba(10,11,26,0.35);border-radius:10px;border-left:3px solid;transition:var(--transition);cursor:pointer}
-.phase:hover{background:rgba(10,11,26,0.55);transform:translateX(4px)}
-.phase.p1{border-left-color:var(--cyan)}.phase.p2{border-left-color:var(--gold)}.phase.p3{border-left-color:var(--green)}.phase.p4{border-left-color:#a855f7}
-.phase-w{font-size:11px;color:var(--muted);font-weight:600}
-.phase-i h3{font-size:13px;font-weight:700;color:#fff}
-.phase-i p{font-size:11px;color:var(--muted)}
-.phase-a{font-size:14px;font-weight:800;color:var(--gold);text-align:right}
-.phase-s{font-size:10px;color:var(--muted);text-align:right;text-transform:uppercase;letter-spacing:.05em}
-.phase-expand{display:none;grid-column:1/-1;padding:12px 0 4px;font-size:12px;color:#9999cc;line-height:1.6;border-top:1px solid rgba(5,217,232,0.04);margin-top:8px}
-.phase-expand.open{display:block}
-.phase-expand strong{color:#fff}
-
-/* ─── BUDGET ─── */
-.budget-items{display:flex;flex-direction:column;gap:10px}
-.bi{display:flex;align-items:center;gap:12px}
-.bi .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.bi .sw.s1{background:var(--cyan)}.bi .sw.s2{background:var(--gold)}.bi .sw.s3{background:var(--green)}.bi .sw.s4{background:#a855f7}
-.bi .bl{flex:1;font-size:13px;color:var(--text)}
-.bi .bp{font-size:12px;font-weight:700;color:var(--gold);width:44px;text-align:right}
-.bi .ba{font-size:11px;color:var(--muted);width:52px;text-align:right}
-.bi .bt{flex:0 0 100px;height:5px;background:rgba(255,255,255,0.03);border-radius:3px;overflow:hidden}
-.bi .bf{height:100%;border-radius:3px}
-.bt-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;margin-top:12px;border-top:1px solid rgba(5,217,232,0.06)}
-.bt-row .tn{font-size:22px;font-weight:900;color:var(--cyan);text-shadow:0 0 20px rgba(5,217,232,0.1)}
-.bt-row .tn small{font-size:13px;color:var(--muted);font-weight:400}
-.broi{font-size:11px;color:var(--green);margin-top:4px;text-align:right}
-
-/* ─── JOURNEY MAP ─── */
-.jmap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-@media(max-width:700px){.jmap{grid-template-columns:1fr}}
-.jstop{cursor:pointer;padding:16px;border-radius:10px;text-align:center;background:rgba(10,11,26,0.35);border:1px solid rgba(5,217,232,0.04);transition:var(--transition)}
-.jstop:hover,.jstop.active{border-color:rgba(255,42,109,0.15);background:rgba(10,11,26,0.5)}
-.jstop .ji{font-size:22px;margin-bottom:6px}
-.jstop .jn{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em}
-.jstop .jd{font-size:10px;color:var(--muted);margin-top:2px}
-.jdetail{display:none;margin-top:10px}
-.jdetail.active{display:block}
-.jd-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:600px){.jd-card{grid-template-columns:1fr}}
-.jd-pain{background:rgba(255,42,109,0.04);border:1px solid rgba(255,42,109,0.08);border-radius:8px;padding:12px 14px}
-.jd-pain .h{font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
-.jd-pain p{font-size:12px;color:#9999cc;line-height:1.5}
-.jd-solution{background:rgba(0,255,65,0.04);border:1px solid rgba(0,255,65,0.08);border-radius:8px;padding:12px 14px}
-.jd-solution .h{font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
-.jd-solution p{font-size:12px;color:#9999cc;line-height:1.5}
-
-/* ─── FAILURE DOSSIER ─── */
-.fail-item{border:1px solid rgba(5,217,232,0.05);border-radius:10px;margin-bottom:10px;overflow:hidden}
-.fail-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;background:rgba(10,11,26,0.3);transition:var(--transition);gap:12px}
-.fail-header:hover{background:rgba(10,11,26,0.5)}
-.fail-header .fleft{display:flex;align-items:center;gap:10px}
-.fail-header .fnum{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
-.fail-header .fnum.danger{background:rgba(255,42,109,0.12);color:var(--red)}
-.fail-header .fnum.warn{background:rgba(255,206,0,0.1);color:var(--gold)}
-.fail-header .fnum.ok{background:rgba(0,255,65,0.1);color:var(--green)}
-.fail-header .fname{font-size:13px;font-weight:700;color:#fff}
-.fail-header .ftoggle{font-size:18px;color:var(--muted);transition:transform .3s;flex-shrink:0}
-.fail-header.open .ftoggle{transform:rotate(45deg)}
-.fail-body{display:none;padding:0 16px}
-.fail-body.open{display:block;padding:16px}
-.fail-desc{font-size:12px;color:#9999cc;line-height:1.6;margin-bottom:12px}
-.fail-desc strong{color:#fff}
-.toggle-group{display:flex;gap:0;margin-bottom:12px;background:rgba(10,11,26,0.3);border-radius:8px;overflow:hidden;border:1px solid rgba(5,217,232,0.05)}
-.tg-btn{padding:7px 16px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:var(--transition);font-family:'Inter',sans-serif;background:transparent;color:var(--muted);flex:1}
-.tg-btn.active{background:rgba(255,42,109,0.1);color:var(--pink)}
-.tg-content{display:none;font-size:12px;line-height:1.6}
-.tg-content.active{display:block}
-.before-box{background:rgba(255,42,109,0.04);border:1px solid rgba(255,42,109,0.08);border-radius:8px;padding:12px 14px;color:#9999cc}
-.before-box .l{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.after-box{background:rgba(0,255,65,0.04);border:1px solid rgba(0,255,65,0.08);border-radius:8px;padding:12px 14px;color:#9999cc}
-.after-box .l{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-
-/* ─── DECISION TIMELINE ─── */
-.dtimeline{position:relative;padding-left:32px}
-.dtimeline::before{content:'';position:absolute;left:11px;top:4px;bottom:4px;width:2px;background:rgba(5,217,232,0.08)}
-.dt-node{position:relative;padding:0 0 16px 20px;cursor:pointer}
-.dt-node:last-child{padding-bottom:0}
-.dt-node .dot{position:absolute;left:-32px;top:4px;width:22px;height:22px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;z-index:1;transition:var(--transition);box-shadow:0 0 10px rgba(0,0,0,0.3)}
-.dt-node .dot.fl{background:rgba(255,42,109,0.15);border-color:var(--red);color:var(--red);box-shadow:0 0 10px rgba(255,42,109,0.1)}
-.dt-node .dot.fx{background:rgba(0,255,65,0.1);border-color:var(--green);color:var(--green);box-shadow:0 0 10px rgba(0,255,65,0.1)}
-.dt-node .dot.warn{background:rgba(255,206,0,0.1);border-color:var(--gold);color:var(--gold);box-shadow:0 0 10px rgba(255,206,0,0.1)}
-.dt-node .dt-h{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
-.dt-node .dt-d{font-size:11px;color:var(--muted);line-height:1.5}
-.dt-node .dt-expand{display:none;margin-top:8px;padding:10px 12px;background:rgba(10,11,26,0.35);border-radius:8px;font-size:12px;color:#9999cc;line-height:1.6;border:1px solid rgba(5,217,232,0.04)}
-.dt-node .dt-expand.open{display:block}
-.dt-node .dt-expand strong{color:#fff}
-.dt-node .dt-expand .alt{display:block;margin-top:6px;padding:6px 10px;background:rgba(255,206,0,0.04);border-left:2px solid var(--gold);border-radius:0 6px 6px 0;font-size:11px;color:var(--muted)}
-
-/* ─── RISK QUADRANT ─── */
-.rquad{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:12px}
-.rq-cell{padding:0;aspect-ratio:1;position:relative}
-.rq-bg{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;z-index:0}
-.rq-bg.ll{background:rgba(0,255,65,0.04)}
-.rq-bg.lh{background:rgba(255,206,0,0.04)}
-.rq-bg.hl{background:rgba(255,206,0,0.04)}
-.rq-bg.hh{background:rgba(255,42,109,0.04)}
-.rq-dot{position:absolute;width:18px;height:18px;border-radius:50%;cursor:pointer;z-index:1;transition:all .3s;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;transform:translate(-50%,-50%)}
-.rq-dot:hover{transform:translate(-50%,-50%) scale(2);z-index:5}
-.rq-dot.high{background:rgba(255,42,109,0.7);border-color:var(--red);box-shadow:0 0 12px rgba(255,42,109,0.2)}
-.rq-dot.med{background:rgba(255,206,0,0.6);border-color:var(--gold);box-shadow:0 0 12px rgba(255,206,0,0.15)}
-.rq-dot.low{background:rgba(0,255,65,0.6);border-color:var(--green);box-shadow:0 0 12px rgba(0,255,65,0.15)}
-.rq-label{position:absolute;font-size:9px;font-weight:600;color:var(--muted);z-index:1}
-.rq-label.ll{top:8px;left:8px}.rq-label.lh{top:8px;right:8px;text-align:right}
-.rq-label.hl{bottom:8px;left:8px}.rq-label.hh{bottom:8px;right:8px;text-align:right}
-.rq-axis-x{display:grid;grid-template-columns:1fr 1fr;text-align:center;font-size:9px;color:var(--muted);margin-top:2px;margin-bottom:8px}
-.rq-axis-y{position:absolute;left:-28px;top:50%;transform:rotate(-90deg) translateY(50%);transform-origin:left center;font-size:9px;color:var(--muted);white-space:nowrap}
-.rq-tooltip{display:none;position:fixed;z-index:100;background:rgba(10,11,26,0.95);backdrop-filter:blur(12px);border:1px solid rgba(5,217,232,0.12);border-radius:8px;padding:10px 14px;font-size:11px;line-height:1.5;max-width:200px;pointer-events:none;box-shadow:0 8px 30px rgba(5,217,232,0.05)}
-.rq-tooltip.show{display:block}
-.rq-tooltip strong{color:#fff}
-.rq-tooltip .r{color:var(--muted);font-size:10px}
-.risk-legend{display:flex;gap:16px;justify-content:center;font-size:10px;color:var(--muted);flex-wrap:wrap}
-.risk-legend span{display:flex;align-items:center;gap:4px}
-.risk-legend .sq{width:10px;height:10px;border-radius:3px;display:inline-block}
-.risk-legend .sq.r{background:rgba(255,42,109,0.3)}.risk-legend .sq.a{background:rgba(255,206,0,0.3)}.risk-legend .sq.g{background:rgba(0,255,65,0.3)}
-
-/* ─── KPI TABLE ─── */
-.tw{overflow-x:auto}
-.tw table{width:100%;border-collapse:collapse;font-size:12px}
-.tw th{text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid rgba(5,217,232,0.06);white-space:nowrap}
-.tw td{padding:8px 10px;border-bottom:1px solid rgba(5,217,232,0.02);vertical-align:middle}
-.tw tr:last-child td{border-bottom:none}
-.tw tr:hover td{background:rgba(5,217,232,0.02)}
-.mn{color:#fff;font-weight:600}.mc{color:var(--muted)}.m6{color:var(--gold);font-weight:700}.m12{color:var(--green);font-weight:700}
-
-.footer{text-align:center;font-size:11px;color:var(--muted);padding:24px 0 12px;border-top:1px solid rgba(5,217,232,0.04);margin-top:20px}
-
-@media(max-width:600px){
-  .dashboard{padding:10px}
-  .hero{padding:28px 16px;margin-bottom:16px}
-  .hero-logo{width:44px;height:44px;margin-bottom:10px}
-  .hero-badge{font-size:9px;padding:3px 10px;margin-bottom:8px}
-  .hero-stats{gap:16px}
-  .hero-stat .num{font-size:22px}
-  .hero h2{font-size:clamp(22px,7vw,32px)}
-  .hero p{font-size:13px}
-  .kpi-grid{grid-template-columns:1fr}
-  .kpi-current{font-size:24px}
-  .phase{grid-template-columns:1fr;gap:4px;padding:10px 12px}
-  .phase-w,.phase-a,.phase-s{text-align:left;font-size:10px}
-  .phase-i h3{font-size:12px}
-  .phase-i p{font-size:10px}
-  .jmap{grid-template-columns:1fr}
-  .jd-card{grid-template-columns:1fr}
-  .rquad{grid-template-columns:1fr 1fr}
-  .top-bar{flex-direction:column;align-items:stretch;padding:10px 14px}
-  .top-bar h1{font-size:16px}
-  .top-bar-meta{justify-content:space-between;flex-wrap:wrap;gap:8px}
-  .tab-btn{padding:8px 10px;font-size:11px}
-  .agent-output{max-height:200px;font-size:12px}
-  .glass{padding:16px}
-  .glass-title{font-size:12px}
-  .flow-detail{font-size:11px}
-  .dt-node{padding-bottom:12px}
-  .dt-node .dt-h{font-size:11px}
-  .dt-node .dt-d{font-size:10px}
-  .synth-banner{font-size:11px;padding:8px 12px;flex-wrap:wrap}
-  .scroll-top{bottom:12px;right:12px;width:36px;height:36px;font-size:16px}
-  .bg-sun{width:300px;height:150px;top:3%}}
-}
-/* ─── INTRO BANNER ─── */
-.intro-banner{position:fixed;inset:0;z-index:99999;background:#070815;display:flex;align-items:center;justify-content:center;transition:transform 1.3s cubic-bezier(.77,0,.18,1);overflow:hidden}
-.intro-banner.hidden{transform:translateY(-100%)}
-.intro-canvas{position:absolute;inset:0;pointer-events:none}
-.intro-grid-wrap{position:absolute;bottom:0;left:0;width:100%;height:55%;perspective:600px;overflow:hidden;pointer-events:none}
-.intro-grid{position:absolute;bottom:-15%;left:-30%;width:160%;height:130%;transform-origin:bottom center;transform:rotateX(65deg)}
-.intro-grid-line{position:absolute;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(5,217,232,0.07),rgba(255,42,109,0.04),transparent);opacity:0;animation:gridLineIn 1.2s ease-out forwards}
-@keyframes gridLineIn{0%{opacity:0;transform:scaleX(0.4)}100%{opacity:1;transform:scaleX(1)}}
-.intro-sun{position:absolute;top:14%;left:50%;transform:translateX(-50%);width:400px;height:200px;border-radius:50%/100% 100% 0 0;background:linear-gradient(180deg,#ff2a6d 0%,#ff6b9d 18%,#ffce00 42%,transparent 75%);opacity:0;animation:sunRise 2s ease-out .3s forwards;pointer-events:none}
-.intro-sun::after{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,transparent 0px,transparent 5px,rgba(0,0,0,0.15) 5px,rgba(0,0,0,0.15) 6px);animation:sunPulse 3s ease-in-out infinite}
-@keyframes sunRise{0%{opacity:0;transform:translateX(-50%) scaleY(0.2)}100%{opacity:0.85;transform:translateX(-50%) scaleY(1)}}
-@keyframes sunPulse{0%,100%{opacity:0.4}50%{opacity:1}}
-.intro-content{position:relative;z-index:10;text-align:center;opacity:0;animation:contentFade .8s ease .8s forwards}
-@keyframes contentFade{0%{opacity:0;transform:translateY(25px)}100%{opacity:1;transform:translateY(0)}}
-.intro-terminal{font-size:13px;font-family:'Courier New',monospace;color:var(--cyan);margin-bottom:22px;height:22px;letter-spacing:.02em;text-shadow:0 0 12px rgba(5,217,232,0.15);min-width:300px}
-.intro-cursor{display:inline-block;animation:cursorBlink .7s step-end infinite;color:var(--cyan);font-weight:100}
-@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
-.intro-title{font-size:clamp(42px,8vw,82px);font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:6px;text-shadow:0 0 50px rgba(5,217,232,0.05)}
-.intro-title-accent{display:block;background:linear-gradient(135deg,#05d9e8 0%,#ffce00 50%,#ff2a6d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:clamp(32px,6vw,66px);letter-spacing:5px;position:relative}
-.intro-glitch{animation:glitch 3.5s ease-in-out 2.5s infinite}
-@keyframes glitch{0%,88%,100%{transform:translate(0);opacity:1}90%{transform:translate(-4px,2px);opacity:0.9;clip-path:inset(30% 0 25% 0)}92%{transform:translate(4px,-1px);opacity:0.85;clip-path:inset(10% 0 55% 0)}94%{transform:translate(-2px,3px);opacity:0.92;clip-path:inset(45% 0 15% 0)}96%{transform:translate(2px,-2px)}}
-.intro-sub{font-size:13px;color:var(--muted);margin-bottom:28px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
-.intro-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 40px;border:1px solid rgba(5,217,232,0.2);border-radius:50px;background:rgba(5,217,232,0.03);color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:.12em;cursor:pointer;transition:all .35s;font-family:'Inter',sans-serif;text-transform:uppercase;opacity:0;animation:introBtnIn .8s ease 4.2s forwards}
-.intro-btn:hover{background:rgba(5,217,232,0.08);border-color:rgba(5,217,232,0.35);box-shadow:0 0 35px rgba(5,217,232,0.06),0 0 70px rgba(5,217,232,0.02);transform:scale(1.03)}
-.intro-btn:hover .intro-btn-arrow{transform:translateX(5px)}
-.intro-btn-arrow{display:inline-block;transition:transform .3s}
-@keyframes introBtnIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
-.intro-hint{font-size:11px;color:var(--muted);margin-top:16px;opacity:0;animation:hintIn .8s ease 5s forwards}
+/* ─── BUTTON ─── */
+.btn-wrap{position:relative;display:inline-block}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 44px;border:1px solid rgba(5,217,232,0.15);border-radius:50px;background:rgba(5,217,232,0.02);color:var(--cyan);font-size:14px;font-weight:700;letter-spacing:.12em;cursor:none;transition:all .4s;font-family:'Inter',sans-serif;text-transform:uppercase;opacity:0;animation:btnIn .9s ease 3.8s forwards;position:relative;overflow:hidden;user-select:none;outline:none}
+.btn:hover{background:rgba(5,217,232,0.07);border-color:rgba(5,217,232,0.3);box-shadow:0 0 40px rgba(5,217,232,0.08),0 0 80px rgba(5,217,232,0.02);transform:scale(1.04)}
+.btn:active{transform:scale(0.97)}
+.btn .arrow{display:inline-block;transition:transform .3s;font-size:16px}
+.btn:hover .arrow{transform:translateX(6px)}
+@keyframes btnIn{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+.btn .ripple-el{position:absolute;border-radius:50%;background:rgba(5,217,232,0.15);pointer-events:none;animation:rippleOut .6s ease-out forwards}
+@keyframes rippleOut{0%{width:0;height:0;opacity:1}100%{width:200px;height:200px;opacity:0}}
+.hint{font-size:12px;color:var(--muted);margin-top:18px;opacity:0;animation:hintIn .8s ease 4.8s forwards}
 @keyframes hintIn{0%{opacity:0}100%{opacity:1}}
-.intro-hint span{color:var(--cyan);font-weight:700}
-.intro-airplane{position:absolute;top:25%;z-index:5;pointer-events:none;opacity:0;animation:planeFly 3.5s ease-in-out 1s forwards}
-@keyframes planeFly{0%{opacity:0;transform:translate(-100px,30px) rotate(-20deg) scale(0.5)}15%{opacity:1}50%{opacity:1}100%{opacity:0;transform:translate(calc(100vw + 100px),-100px) rotate(8deg) scale(0.9)}}
-.intro-airplane svg{width:72px;height:72px;filter:drop-shadow(0 0 50px rgba(5,217,232,0.35)) drop-shadow(0 0 100px rgba(255,42,109,0.15))}
-.intro-trail{position:absolute;top:50%;right:100%;width:200px;height:2px;background:linear-gradient(270deg,rgba(5,217,232,0.25),transparent)}
-.intro-vline{position:absolute;top:0;left:50%;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(5,217,232,0.03),transparent);pointer-events:none;opacity:0;animation:hlineIn 1.5s ease .5s forwards}
-@keyframes hlineIn{0%{opacity:0;transform:scaleY(0)}100%{opacity:1;transform:scaleY(1)}}
+.hint span{color:var(--cyan);font-weight:700}
+.hint kbd{display:inline-block;padding:1px 8px;background:rgba(5,217,232,0.06);border:1px solid rgba(5,217,232,0.1);border-radius:4px;font-size:11px;font-family:'Inter',monospace;color:var(--cyan)}
+.status-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:20;font-size:11px;color:rgba(136,136,187,0.4);letter-spacing:.1em;font-family:'Courier New',monospace;opacity:0;animation:hintIn 1s ease 5.5s forwards}
+.status-bar span{color:rgba(5,217,232,0.3)}
 
+/* ─── LOADING BAR ─── */
+.load-bar{position:fixed;top:0;left:0;width:100%;height:3px;z-index:20;background:rgba(5,217,232,0.02)}
+.load-bar .fill{height:100%;width:0%;background:linear-gradient(90deg,#ff2a6d,#ffce00,#05d9e8);animation:loadFill 5s linear forwards}
+@keyframes loadFill{0%{width:0%}100%{width:100%}}
+
+/* ─── MOBILE ─── */
 @media(max-width:600px){
-  .intro-title{font-size:clamp(28px,10vw,46px)}
-  .intro-title-accent{font-size:clamp(22px,8vw,38px);letter-spacing:3px}
-  .intro-terminal{font-size:10px;min-width:auto}
-  .intro-sub{font-size:10px;letter-spacing:.1em;margin-bottom:22px}
-  .intro-btn{padding:12px 28px;font-size:11px}
-  .intro-sun{width:260px;height:130px;top:16%}
-  .intro-grid-wrap{height:45%}
+  body{cursor:auto}
+  .title{font-size:clamp(30px,10vw,44px)}
+  .title-accent{font-size:clamp(24px,8vw,36px);letter-spacing:4px}
+  .terminal{font-size:11px;min-width:auto;margin-bottom:18px;height:20px}
+  .sub{font-size:10px;margin-bottom:24px;letter-spacing:.12em}
+  .btn{padding:14px 30px;font-size:12px;cursor:pointer}
+  .sun-display{width:220px;height:100px;top:14%}
+  .grid-scene{height:45%}
+  .airplane svg{width:56px;height:56px}
+  #cursorGlow{display:none}
+  .status-bar{font-size:10px;bottom:16px}
+  .bg-grid{background-size:40px 40px}
 }
 </style>
 </head>
 <body>
-<!-- INTRO BANNER -->
-<div class="intro-banner" id="introBanner">
-  <canvas class="intro-canvas" id="introCanvas"></canvas>
-  <div class="intro-grid-wrap"><div class="intro-grid" id="introGrid"></div></div>
-  <div class="intro-sun"></div>
-  <div class="intro-vline"></div>
-  <div class="intro-airplane">
-    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#ig)"/>
-      <line x1="43" y1="29" x2="52" y2="20" stroke="url(#ig)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-      <defs><linearGradient id="ig" x1="0" y1="0" x2="72" y2="72"><stop stop-color="#05d9e8"/><stop offset="0.5" stop-color="#ffce00"/><stop offset="1" stop-color="#ff2a6d"/></linearGradient></defs>
-    </svg>
-    <div class="intro-trail"></div>
-  </div>
-  <div class="intro-content">
-    <div class="intro-terminal"><span id="terminalText"></span><span class="intro-cursor">|</span></div>
-    <div class="intro-title">CLOUDNINE<span class="intro-title-accent intro-glitch">REWARDS</span></div>
-    <div class="intro-sub">Strategy Dashboard — Octopus Pipeline v2</div>
-    <button class="intro-btn" onclick="launchDashboard()"><span class="intro-btn-arrow">▶</span> Launch Control</button>
-    <div class="intro-hint">Auto-launching in <span id="introTimer">5</span>s</div>
-  </div>
-</div>
+
+<!-- CURSOR GLOW -->
+<div id="cursorGlow"></div>
+
+<!-- LOADING BAR -->
+<div class="load-bar"><div class="fill"></div></div>
+
+<!-- SCANLINES -->
 <div class="bg-scan"></div>
+
+<!-- ORBS -->
 <div class="bg-orb"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+
+<!-- SUN -->
 <div class="bg-sun"></div>
+
+<!-- SYNTHWAVE GRID -->
 <div class="bg-grid"></div>
 
-<div class="dashboard" id="dashboard-content">
+<!-- PERSPECTIVE GRID SCENE -->
+<div class="grid-scene" id="gridScene"><div class="grid-stage" id="gridStage"></div></div>
 
-  <!-- SYNTHETIC BANNER -->
-  <div class="synth-banner"><span class="badge">Synthetic</span> All financial values in <strong>EUR</strong> based on comparable European budget carrier benchmarks (Ryanair, easyJet, Wizz Air). PPAR baseline estimated at €40/pp (bottom quartile LCC) per IdeaWorksCompany 2025 data. See <strong>Decision Log</strong> for assumptions.</div>
+<!-- RETRO SUN -->
+<div class="sun-display" id="sunDisplay"></div>
 
-  <!-- TOP BAR -->
-  <div class="top-bar">
-    <div class="top-bar-left"><div class="top-bar-logo">C9</div><h1>CloudNine <span>Rewards</span></h1></div>
-    <div class="top-bar-meta"><span class="badge">Updated June 2026</span><button class="export-btn" onclick="exportPDF()" id="exportBtn">Export PDF</button></div>
-  </div>
+<!-- PARTICLES CANVAS -->
+<canvas id="particleCanvas"></canvas>
 
-  <!-- AGENT OUTPUT TABS -->
-  <div class="tab-bar" id="agentTabs">
-    <button class="tab-btn active" data-tab="tab-res">🔬 Researcher</button>
-    <button class="tab-btn" data-tab="tab-des">🎨 Designer</button>
-    <button class="tab-btn" data-tab="tab-com">📣 Communicator</button>
-  </div>
-
-  <!-- RESEARCHER TAB -->
-  <div class="tab-panel active" id="tab-res">
-    <div class="glass"><div class="glass-title"><span class="icon ic-gold">◈</span> Researcher Output</div>
-    <div class="agent-output">
-<strong>🔬 CloudNine Airlines — CX & Retention Research</strong>
-
-<strong>Challenge 1: Loyalty Programme Dormancy (85% inactive)</strong>
-<strong>Why it matters:</strong> 800k members, only 120k active (15%). That's 680k members who signed up but never reached a meaningful earning milestone. Industry: 95% of airline loyalty reviews rated 1 star on Trustpilot (TNMT 2025).
-<strong>Metric link:</strong> Only 20% of annual passengers join. Industry benchmark: 40-50% enrolment, 30-40% active.
-<strong>Diagnostic signals:</strong> Time-to-first-redemption, earning velocity, onboarding completion rate, redemption friction score, NPS by tier.
-
-<strong>Challenge 2: Post-Booking Experience Friction</strong>
-<strong>Why it matters:</strong> Budget airline customers chose CloudNine for cost, not love. 77% of travellers multi-channel before booking (McKinsey). Post-booking is highest-intent window for ancillary conversion. Breeze Airways scored top Consumer Reports marks simply by being "nice."
-<strong>Metric link:</strong> 4M pax, ancillary below ~€83/pp industry avg. Low ancillary = poor post-booking conversion.
-<strong>Diagnostic signals:</strong> Email open rate, self-service adoption, ancillary uptake by channel, CSAT by journey stage.
-
-<strong>Challenge 3: Ancillary Revenue Conversion Gap</strong>
-<strong>Why it matters:</strong> Top LCCs generate 38-62% of revenue from ancillaries (IdeaWorksCompany 2025). Global average PPAR ~€83/pp. CloudNine trails.
-<strong>Metric link:</strong> 4M pax × gap between current PPAR and industry avg = tens of millions. 65% of revenue comes from existing customers; CloudNine's low active rate means it's not monetising its base.
-<strong>Diagnostic signals:</strong> PPAR by route/cabin, browse-to-buy by add-on, bundling effectiveness, payment failure rate, member vs non-member spend.
-
-<div class="handoff"><strong>→ Handoff to Designer:</strong> Three linked problems, one root cause: CloudNine is absent from the customer journey between booking and departure. Strategy must attack all three with a single connected system. Budget airline constraints: thin margins, no lounges, price-sensitive passengers.</div>
-    </div></div>
-  </div>
-
-  <!-- DESIGNER TAB -->
-  <div class="tab-panel" id="tab-des">
-    <div class="glass"><div class="glass-title"><span class="icon ic-gold">◈</span> Designer Output</div>
-    <div class="agent-output">
-<strong>🎨 CloudNine Airlines — Three-Part Retention Strategy</strong>
-
-<strong>Part 1: Instant Value Loyalty Reboot</strong>
-Replace slow-accumulation points with instant gratification: 500 bonus points + free priority boarding on sign-up. Simplified tiers (Member/Regular/Frequent). Low-bar redemption (points for fee waivers, not aspirational travel). 90-day re-engagement triggers for dormant. Goal: active rate 15% → 30%.
-
-<strong>Part 2: Post-Booking Experience Engine</strong>
-6-message automated sequence (booking → T-7 → T-48 → departure → post-landing → T+7). Mobile web self-service hub (no app download). Proactive disruption messaging with goodwill gestures. "Helpful travel companion" tone. Goal: email open rate <40% → 55%+, contact volume -25%.
-
-<strong>Part 3: Contextual Ancillary Conversion</strong>
-Route-based, trip-purpose-based, party-based personalisation. Bundled pricing. Loyalty-linked discounts (members save 20%). Apple/Google Pay one-click. Bags, seats, priority, insurance at contextual moments. Goal: PPAR +30%, payment failure <2%.
-
-<strong>Integration flywheel:</strong> Better post-booking → higher ancillary conversion → more points → more loyalty engagement → better personalisation data → more relevant offers → higher conversion.
-
-<div class="handoff"><strong>→ Handoff to Communicator:</strong> Executive summary (leadership-facing) + campaign brief (operations-facing). Specific recommendations, success metrics, phased implementation timeline.</div>
-    </div></div>
-  </div>
-
-  <!-- COMMUNICATOR TAB -->
-  <div class="tab-panel" id="tab-com">
-    <div class="glass"><div class="glass-title"><span class="icon ic-gold">◈</span> Communicator Output</div>
-    <div class="agent-output">
-<strong>📣 CloudNine Airlines — Executive Summary & Campaign Brief</strong>
-
-<strong>Situation:</strong> 4M pax, 800k loyalty members at 15% active, ancillary below industry benchmark. Root cause: CloudNine is not present in the customer journey between booking and departure.
-
-<strong>Financial opportunity:</strong> Even €5/pp increase = €20M annual revenue. Programme cost: €500k. Target ROI: 3-5x in 12 months.
-
-<strong>Campaign: "CloudNine Rewards: Your next trip, better."</strong>
-
-<strong>Phase 1 (Weeks 1-4, €200k):</strong> Infrastructure — email system, self-service hub, loyalty reconfig, Apple/Google Pay.
-<strong>Phase 2 (Weeks 5-6, €100k):</strong> Dormant re-engagement — SMS-first to 680k members ("you have X points — use within 60 days"). Non-member acquisition at booking confirmation.
-<strong>Phase 3 (Weeks 7-12, €50k):</strong> Journey activation — 6-message sequence for all passengers. Contextual ancillary offers + loyalty moments at each touchpoint.
-<strong>Phase 4 (Months 3-6, €150k):</strong> Optimisation — A/B testing, route personalisation, dynamic bundles, referral programme.
-
-<strong>Key metrics:</strong> Active rate 15%→30% (6mo), PPAR +30% (12mo), email open <40%→55% (6mo), redemption rate →30% (6mo).
-
-<div class="handoff"><strong>→ Final:</strong> Full strategy brief delivered with phased budget, risk mitigations, and SMART targets for each phase.</div>
-    </div></div>
-  </div>
-
-  <!-- HERO -->
-  <section class="hero" data-parallax="0.15">
-    <canvas class="hero-canvas" id="heroCanvas"></canvas>
-    <div class="hero-bg" data-parallax="0.08"></div>
-    <div class="hero-glow"></div>
-    <div class="inner">
-      <div class="hero-logo">
-        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="36" cy="36" r="33" stroke="url(#hg)" stroke-width="1.2" fill="rgba(5,217,232,0.03)" stroke-dasharray="4 3"/>
-          <circle cx="36" cy="36" r="26" stroke="url(#hg)" stroke-width="0.8" fill="rgba(255,42,109,0.02)" stroke-dasharray="2 4"/>
-          <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#hg)"/>
-          <line x1="43" y1="29" x2="50" y2="22" stroke="url(#hg)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-          <circle cx="50" cy="22" r="2" fill="#05d9e8" opacity="0.6"/>
-          <defs><linearGradient id="hg" x1="0" y1="0" x2="72" y2="72"><stop stop-color="#05d9e8"/><stop offset="0.5" stop-color="#ffce00"/><stop offset="1" stop-color="#ff2a6d"/></linearGradient></defs>
-        </svg>
-      </div>
-      <div class="hero-badge">◈ Synthwave Dashboard</div>
-      <h2><span class="line">Experience &amp; Retention</span><span class="line gold">Strategy Dashboard</span></h2>
-      <p>A connected three-part retention system to reduce loyalty dormancy, eliminate post-booking friction, and grow ancillary revenue — built for CloudNine's budget airline context.</p>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="num gold">4M</div><div class="label">Annual Passengers</div></div>
-        <div class="hero-stat"><div class="num blue">800K</div><div class="label">Loyalty Members</div></div>
-        <div class="hero-stat"><div class="num green">€500K</div><div class="label">Programme Budget</div></div>
-        <div class="hero-stat"><div class="num gold">3-5x</div><div class="label">Target ROI</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AGENT HANDOFF VISUALISER -->
-  <div class="glass section">
-    <div class="glass-title"><span class="icon ic-cyan">◈</span> Agent Pipeline — click a node to see output</div>
-    <div class="flow-wrap">
-      <div class="flow">
-        <div class="flow-node fl-res active" data-flow="res" onclick="toggleFlow('res')">
-          <div class="circle" style="position:relative">R<div class="ripple" style="border-color:#eab308"></div></div>
-          <div class="label">Researcher</div><div class="sub">Yellow</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node fl-des" data-flow="des" onclick="toggleFlow('des')">
-          <div class="circle">D</div>
-          <div class="label">Designer</div><div class="sub">Red-Orange</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node fl-com" data-flow="com" onclick="toggleFlow('com')">
-          <div class="circle">C</div>
-          <div class="label">Communicator</div><div class="sub">Green</div>
-        </div>
-      </div>
-    </div>
-    <!-- Details -->
-    <div class="flow-detail open" id="flow-res">
-      <span class="tag res">Research</span> <strong>3 challenges identified:</strong> Loyalty dormancy (85% inactive), post-booking friction, ancillary conversion gap. Each mapped to business metrics and diagnostic data signals. <strong>→ Handed off to Designer</strong>
-    </div>
-    <div class="flow-detail" id="flow-des">
-      <span class="tag des">Design</span> <strong>3-part strategy:</strong> Instant-value loyalty reboot, post-booking experience engine, contextual ancillary conversion. Connected flywheel design. <strong>→ Handed off to Communicator</strong>
-    </div>
-    <div class="flow-detail" id="flow-com">
-      <span class="tag com">Communication</span> <strong>Executive summary + campaign brief.</strong> Phased budget, SMART targets, 4-phase timeline, risk register. <strong>→ Dashboard deployed</strong>
-    </div>
-  </div>
-
-  <!-- KPI GRID -->
-  <div class="kpi-grid section">
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">Loyalty Active Rate</div>
-      <div class="kpi-main"><div class="kpi-current" data-count="15">0%</div><div class="kpi-target">→ <span>30%</span> (6mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill warning" data-width="37"></div></div>
-      <div class="kpi-detail"><span class="tag warn">● Off pace</span><span>680k dormant</span></div>
-    </div>
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">PPAR per passenger</div>
-      <div class="kpi-main"><div class="kpi-current" style="color:var(--gold)">€40</div><div class="kpi-target">→ <span>€52</span> (+30%, 12mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill warning" data-width="48"></div></div>
-      <div class="kpi-detail"><span class="tag warn">● Estimate</span><span style="font-size:10px;color:var(--muted)">vs industry avg €83</span></div>
-    </div>
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">Post-Booking Email Open Rate</div>
-      <div class="kpi-main"><div class="kpi-current" data-count="38">0%</div><div class="kpi-target">→ <span>55%</span> (6mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill warning" data-width="30"></div></div>
-      <div class="kpi-detail"><span class="tag warn">● Needs improvement</span><span>Target: 60% (12mo)</span></div>
-    </div>
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">Onboarding Completion Rate</div>
-      <div class="kpi-main"><div class="kpi-current" style="color:var(--muted)">--</div><div class="kpi-target">→ <span>40%</span> (6mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill na" data-width="0"></div></div>
-      <div class="kpi-detail"><span class="tag na">● Not tracked</span></div>
-    </div>
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">Self-Service Adoption Rate</div>
-      <div class="kpi-main"><div class="kpi-current" style="color:var(--muted)">--</div><div class="kpi-target">→ <span>60%</span> (6mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill na" data-width="0"></div></div>
-      <div class="kpi-detail"><span class="tag na">● Not tracked</span></div>
-    </div>
-    <div class="kpi-card"><div class="glow"></div>
-      <div class="kpi-label">Redemption Rate</div>
-      <div class="kpi-main"><div class="kpi-current" style="color:var(--muted)">--</div><div class="kpi-target">→ <span>30%</span> (6mo)</div></div>
-      <div class="kpi-bar"><div class="kpi-bar-fill na" data-width="0"></div></div>
-      <div class="kpi-detail"><span class="tag na">● Not tracked</span></div>
-    </div>
-  </div>
-
-  <!-- FAILURE DOSSIER -->
-  <div class="glass section">
-    <div class="glass-title"><span class="icon ic-pink">◈</span> Failure Dossier — click to expand</div>
-
-    <!-- Fail 1 -->
-    <div class="fail-item">
-      <div class="fail-header" onclick="toggleFail(this)">
-        <div class="fleft"><div class="fnum danger">1</div><span class="fname">Currency Inconsistency (GBP vs EUR)</span></div>
-        <span class="ftoggle">+</span>
-      </div>
-      <div class="fail-body">
-        <div class="fail-desc"><strong>Issue:</strong> Agent 3 used GBP (€) throughout the dashboard despite the brief specifying a European budget carrier. The agent defaulted to UK market assumptions without grounding in the assigned business context.</div>
-        <div class="toggle-group">
-          <button class="tg-btn before-active active" onclick="showFailView(this,'fail1')">Before Fix</button>
-          <button class="tg-btn" onclick="showFailView(this,'fail1')">After Fix</button>
-        </div>
-        <div class="tg-content active" data-group="fail1" data-view="before">
-          <div class="before-box"><div class="l">☓ BEFORE</div>Budget: €500k programme spend. Phase allocations: €200k Foundation, €100k Launch, €50k Activation, €150k Optimisation. Ancillary prices: €5 goodwill gesture, €12 seat upgrade.</div>
-        </div>
-        <div class="tg-content" data-group="fail1" data-view="after">
-          <div class="after-box"><div class="l">✓ AFTER</div>All 57 GBP references replaced with EUR. Added synthetic data banner noting benchmarks from Ryanair, easyJet, Wizz Air. Decision Log created documenting root cause (UK bias in agent training data).</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fail 2 -->
-    <div class="fail-item">
-      <div class="fail-header" onclick="toggleFail(this)">
-        <div class="fleft"><div class="fnum warn">2</div><span class="fname">PPAR Baseline Missing</span></div>
-        <span class="ftoggle">+</span>
-      </div>
-      <div class="fail-body">
-        <div class="fail-desc"><strong>Issue:</strong> No current PPAR (per-passenger ancillary revenue) figure was available. The dashboard showed "--" for the most critical metric in the financial case, making the +20%/+30% targets unanchored.</div>
-        <div class="toggle-group">
-          <button class="tg-btn before-active active" onclick="showFailView(this,'fail2')">Before Fix</button>
-          <button class="tg-btn" onclick="showFailView(this,'fail2')">After Fix</button>
-        </div>
-        <div class="tg-content active" data-group="fail2" data-view="before">
-          <div class="before-box"><div class="l">☓ BEFORE</div>PPAR field: "--" with no estimated baseline. Revenue targets unanchored — the ""€20M annual gain"" calculation used a hypothetical €5/pp increase with no supporting data.</div>
-        </div>
-        <div class="tg-content" data-group="fail2" data-view="after">
-          <div class="after-box"><div class="l">✓ AFTER</div>Synthetic baseline estimated at <strong>€40/pp</strong> (bottom quartile LCC, consistent with ""below industry average""). Source: IdeaWorksCompany 2025 Yearbook (61 airlines). At 4M pax, a 30% lift = €12/pp = €48M annual opportunity.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fail 3 -->
-    <div class="fail-item">
-      <div class="fail-header" onclick="toggleFail(this)">
-        <div class="fleft"><div class="fnum ok">3</div><span class="fname">GDPR Privacy Gap in SMS Campaign</span></div>
-        <span class="ftoggle">+</span>
-      </div>
-      <div class="fail-body">
-        <div class="fail-desc"><strong>Issue:</strong> The dormant re-engagement campaign proposed SMS-first outreach to 680k members with no mention of GDPR consent, opt-in provenance, or privacy impact assessment. For a European airline, this is a regulatory blind spot.</div>
-        <div class="toggle-group">
-          <button class="tg-btn before-active active" onclick="showFailView(this,'fail3')">Before Fix</button>
-          <button class="tg-btn" onclick="showFailView(this,'fail3')">After Fix</button>
-        </div>
-        <div class="tg-content active" data-group="fail3" data-view="before">
-          <div class="before-box"><div class="l">☓ BEFORE</div>""SMS-first re-engagement for 680k dormant members"" — no mention of consent checks, opt-in records, or right-to-object processing. Risk of regulatory complaint and reputational damage.</div>
-        </div>
-        <div class="tg-content" data-group="fail3" data-view="after">
-          <div class="after-box"><div class="l">✓ AFTER</div>Added to risk register: ""SMS opt-out rates high"" with mitigation (cap at 2/month, offer email-only preference). New recommendation: pre-campaign data audit to confirm opt-in provenance; SMS only for members who opted in at sign-up; email-first fallback for all others.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TWO-COL: Timeline + Budget -->
-  <div class="two-col section">
-    <div class="glass">
-      <div class="glass-title"><span class="icon ic-blue">◈</span> Implementation Timeline</div>
-      <div class="phase-list">
-        <div class="phase p1" onclick="togglePhase(this)">
-          <div class="phase-w">Weeks 1-4</div>
-          <div class="phase-i"><h3>Foundation</h3><p>Email system · Self-service hub · Loyalty reconfig · Payments</p></div>
-          <div><div class="phase-a">€200k</div><div class="phase-s">In progress</div></div>
-          <div class="phase-expand"><strong>Deliverables:</strong> automated post-booking email sequence, mobile self-service hub at cloudnine.com/trip/[id], loyalty programme reconfiguration (instant welcome reward, simplified tiers), Apple/Google Pay integration, data segmentation.<br><strong>Owner:</strong> CRM/Marketing, Product/Engineering</div>
-        </div>
-        <div class="phase p2" onclick="togglePhase(this)">
-          <div class="phase-w">Weeks 5-6</div>
-          <div class="phase-i"><h3>Launch — Re-engagement</h3><p>SMS dormant reactivation · Non-member acquisition</p></div>
-          <div><div class="phase-a">€100k</div><div class="phase-s">Not started</div></div>
-          <div class="phase-expand"><strong>Wave 1:</strong> SMS-first to 680k dormant members: ""You have X points — use within 60 days."" Expected reactivation: 10-15%. <strong>Wave 2:</strong> Post-booking non-member acquisition at confirmation page.</div>
-        </div>
-        <div class="phase p3" onclick="togglePhase(this)">
-          <div class="phase-w">Weeks 7-12</div>
-          <div class="phase-i"><h3>Journey Activation</h3><p>6-message sequence · Contextual offers · Loyalty moments</p></div>
-          <div><div class="phase-a">€50k</div><div class="phase-s">Not started</div></div>
-          <div class="phase-expand"><strong>6-message sequence</strong> for all passengers: Booking Confirmation · T-7 days · T-48 hours · Departure · Post-Landing · T+7 days. Each message: 1 contextual offer + 1 loyalty moment. Target: 55%+ open rate.</div>
-        </div>
-        <div class="phase p4" onclick="togglePhase(this)">
-          <div class="phase-w">Months 3-6</div>
-          <div class="phase-i"><h3>Optimisation</h3><p>A/B tests · Personalisation · Bundles · Referrals</p></div>
-          <div><div class="phase-a">€150k</div><div class="phase-s">Not started</div></div>
-          <div class="phase-expand"><strong>Initiatives:</strong> A/B test message timing (T-7 vs T-5 vs T-3), route-based personalisation, dynamic bundles, referral programme (500+500 points), points expiry pressure for dormant.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass">
-      <div class="glass-title"><span class="icon ic-gold">◈</span> Budget Allocation</div>
-      <div class="budget-items">
-        <div class="bi"><div class="sw s1"></div><span class="bl">Foundation</span><div class="bt"><div class="bf" style="width:40%;background:var(--blue)"></div></div><span class="bp">40%</span><span class="ba">€200k</span></div>
-        <div class="bi"><div class="sw s2"></div><span class="bl">Re-engagement</span><div class="bt"><div class="bf" style="width:20%;background:var(--gold)"></div></div><span class="bp">20%</span><span class="ba">€100k</span></div>
-        <div class="bi"><div class="sw s3"></div><span class="bl">Journey Activation</span><div class="bt"><div class="bf" style="width:10%;background:var(--green)"></div></div><span class="bp">10%</span><span class="ba">€50k</span></div>
-        <div class="bi"><div class="sw s4"></div><span class="bl">Optimisation &amp; Scale</span><div class="bt"><div class="bf" style="width:30%;background:var(--purple)"></div></div><span class="bp">30%</span><span class="ba">€150k</span></div>
-        <div class="bt-row"><span>Total programme cost</span><span class="tn">€500k <small>capital</small></span></div>
-        <div class="broi">Target revenue uplift: 3-5x ROI within 12 months</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUSTOMER JOURNEY MAP -->
-  <div class="glass section">
-    <div class="glass-title"><span class="icon ic-cyan">◈</span> Customer Journey Map — Experience & Retention Lens</div>
-    <div class="jmap">
-      <div class="jstop active" onclick="toggleJourney(this,'j1')"><div class="ji">🔍</div><div class="jn">Book</div><div class="jd">Discovery → Purchase</div></div>
-      <div class="jstop" onclick="toggleJourney(this,'j2')"><div class="ji">⏳</div><div class="jn">Pre-flight</div><div class="jd">Booking → Departure</div></div>
-      <div class="jstop" onclick="toggleJourney(this,'j3')"><div class="ji">✈️</div><div class="jn">In-flight</div><div class="jd">Boarding → Landing</div></div>
-      <div class="jstop" onclick="toggleJourney(this,'j4')"><div class="ji">🏁</div><div class="jn">Post-flight</div><div class="jd">Arrival → Next Booking</div></div>
-    </div>
-
-    <div class="jdetail active" id="j1">
-      <div class="jd-card">
-        <div class="jd-pain"><div class="h">⚠ Pain Points</div><p>No loyalty value shown during booking. Price comparison against competitors (Ryanair/easyJet) on pure fare. No personalised upsell. Email capture optional and not incentivised.</p></div>
-        <div class="jd-solution"><div class="h">✓ Solution</div><p>""Join CloudNine Rewards — get 500 bonus points + free priority boarding"" at booking confirmation. Bundled ancillaries with member pricing. Post-booking email capture with instant reward.</p></div>
-      </div>
-    </div>
-    <div class="jdetail" id="j2">
-      <div class="jd-card">
-        <div class="jd-pain"><div class="h">⚠ Pain Points</div><p>Communication void between booking and departure. No contextual ancillary offers. Baggage anxiety (size/weight confusion — see EU legal cases). No self-service options. <strong>This is where loyalty dies.</strong></p></div>
-        <div class="jd-solution"><div class="h">✓ Solution</div><p>6-message automated sequence with contextual offers. Mobile self-service hub (no app). Proactive disruption SMS with goodwill gestures. Points balance visible at every touchpoint.</p></div>
-      </div>
-    </div>
-    <div class="jdetail" id="j3">
-      <div class="jd-card">
-        <div class="jd-pain"><div class="h">⚠ Pain Points</div><p>In-flight experience is the only moment of truth — but for budget carriers, it's transactional. No loyalty touchpoint during the flight. No recognition of member status.</p></div>
-        <div class="jd-solution"><div class="h">✓ Solution</div><p>Breeze Airways benchmark: staff ""niceness"" drove top Consumer Reports scores. Crew greeting for Frequent tier members. Post-landing SMS: ""Welcome to [city]. You earned X points.""</p></div>
-      </div>
-    </div>
-    <div class="jdetail" id="j4">
-      <div class="jd-card">
-        <div class="jd-pain"><div class="h">⚠ Pain Points</div><p>No post-trip engagement. No feedback collection. Points earned but invisible. No reason to return. 61% of 18-34s self-gift while holiday shopping — CloudNine captures none of this.</p></div>
-        <div class="jd-solution"><div class="h">✓ Solution</div><p>T+7 email: ""You earned X points. Your balance: Y — enough for a free bag on your next trip."" Retargeting for Christmas self-gifters. Referral programme: give 500, get 500.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- KPI TABLE -->
-  <div class="glass section">
-    <div class="glass-title"><span class="icon ic-green">◈</span> KPI Targets</div>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Metric</th><th>Current</th><th>6-Month</th><th>12-Month</th></tr></thead>
-        <tbody>
-          <tr><td class="mn">Loyalty Active Rate</td><td class="mc">15%</td><td class="m6">30%</td><td class="m12">40%</td></tr>
-          <tr><td class="mn">PPAR Increase</td><td class="mc">€40/pp (est.)</td><td class="m6">+20%</td><td class="m12">+30%</td></tr>
-          <tr><td class="mn">Post-Booking Email Open Rate</td><td class="mc">&lt;40%</td><td class="m6">55%</td><td class="m12">60%</td></tr>
-          <tr><td class="mn">Onboarding Completion Rate</td><td class="mc">--</td><td class="m6">40%</td><td class="m12">50%</td></tr>
-          <tr><td class="mn">Self-Service Adoption Rate</td><td class="mc">--</td><td class="m6">60%</td><td class="m12">75%</td></tr>
-          <tr><td class="mn">Redemption Rate</td><td class="mc">--</td><td class="m6">30%</td><td class="m12">45%</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- RISK MATRIX + DECISION LOG -->
-  <div class="two-col section">
-
-    <!-- Risk Quadrant -->
-    <div class="glass" style="position:relative">
-      <div class="glass-title"><span class="icon ic-purple">◈</span> Risk Matrix — hover dots for details</div>
-      <div class="rquad">
-        <div class="rq-cell" style="position:relative">
-          <div class="rq-bg ll"></div>
-          <span class="rq-label ll">Low Likelihood<br>Low Impact</span>
-          <div class="rq-dot low" style="left:30%;top:30%" data-risk="Email fatigue — capped at 6 per journey, A/B test frequency. Easy unsubscribe in every message."></div>
-        </div>
-        <div class="rq-cell" style="position:relative">
-          <div class="rq-bg lh"></div>
-          <span class="rq-label lh">Low Likelihood<br>High Impact</span>
-          <div class="rq-dot med" style="left:70%;top:25%" data-risk="Points expiry backlash — frame as 'use it or lose it' with clear value communication. Offer grace period for first wave."></div>
-        </div>
-        <div class="rq-cell" style="position:relative">
-          <div class="rq-bg hl"></div>
-          <span class="rq-label hl">High Likelihood<br>Low Impact</span>
-          <div class="rq-dot med" style="left:30%;top:70%" data-risk="SMS opt-out rates — cap at 2 SMS/month per dormant member. Offer email-only preference during sign-up."></div>
-        </div>
-        <div class="rq-cell" style="position:relative">
-          <div class="rq-bg hh"></div>
-          <span class="rq-label hh">High Likelihood<br>High Impact</span>
-          <div class="rq-dot high" style="left:70%;top:75%" data-risk="Loyalty system integration delays — start Phase 1 early. Manual fallback for welcome rewards if system not ready."></div>
-        </div>
-      </div>
-      <div style="padding-left:28px">
-        <div class="rq-axis-x"><span>Low Likelihood</span><span>High Likelihood</span></div>
-      </div>
-      <div class="rq-tooltip" id="rqTooltip"></div>
-      <div class="risk-legend">
-        <span><span class="sq r"></span> High Risk</span>
-        <span><span class="sq a"></span> Medium Risk</span>
-        <span><span class="sq g"></span> Low Risk</span>
-      </div>
-    </div>
-
-    <!-- Decision Timeline -->
-    <div class="glass">
-      <div class="glass-title"><span class="icon ic-purple">◈</span> Decision Log — click to expand</div>
-      <div class="dtimeline">
-        <div class="dt-node" onclick="toggleDecision(this)">
-          <div class="dot fl">✗</div>
-          <div class="dt-h">Currency Inconsistency (GBP → EUR)</div>
-          <div class="dt-d">Agent 3 defaulted to UK assumptions. All references fixed.</div>
-          <div class="dt-expand"><strong>Root cause:</strong> Agent training data carries UK/GBP bias for airline tasks. Brief specified European carrier but signal wasn't weighted strongly enough.<br><strong>Fix:</strong> All 57 GBP → EUR. Added synthetic data banner.<span class="alt"><strong>Rejected alternative:</strong> Leaving as GBP with a currency conversion note — would not address the underlying contextual failure.</span></div>
-        </div>
-        <div class="dt-node" onclick="toggleDecision(this)">
-          <div class="dot warn">⚠</div>
-          <div class="dt-h">PPAR Baseline — Synthetic Data</div>
-          <div class="dt-d">No baseline provided in brief. Estimated €40/pp from industry data.</div>
-          <div class="dt-expand"><strong>Basis:</strong> IdeaWorksCompany 2025 Yearbook (61 airlines) — bottom quartile LCC PPAR at ~€35-45/pp. CloudNine stated as ""below industry average."" Selected €40/pp as conservative estimate.<br><strong>Impact if wrong:</strong> At €30/pp, 30% lift = +€9/pp (€36M). At €60/pp, 30% lift = +€18/pp (€72M). Material to budget case.<span class="alt"><strong>Rejected alternative:</strong> Leaving as ""--"" with no estimate — dashboard would show gap but provide no basis for financial projections.</span></div>
-        </div>
-        <div class="dt-node" onclick="toggleDecision(this)">
-          <div class="dot fx">✓</div>
-          <div class="dt-h">GDPR Privacy Gap Identified</div>
-          <div class="dt-d">SMS campaign lacked consent/opt-in provenance. Added mitigations.</div>
-          <div class="dt-expand"><strong>Issue:</strong> Original campaign proposed SMS-first to 680k dormant members without privacy impact assessment. European airline — GDPR Article 6 (lawful basis) applies.<br><strong>Fix:</strong> Pre-campaign data audit to confirm opt-in provenance. SMS only for members who opted in at sign-up. Email-first fallback for all others. Added to risk register.<span class="alt"><strong>Rejected alternative:</strong> Generic ""compliance check"" note — too vague. Specific audit and channel preference logic required.</span></div>
-        </div>
-        <div class="dt-node" onclick="toggleDecision(this)">
-          <div class="dot fx">✓</div>
-          <div class="dt-h">680k Dormant — Maths Confirmed</div>
-          <div class="dt-d">800k members - 15% active = 680,000 dormant. Correct. No change.</div>
-          <div class="dt-expand"><strong>Calculation:</strong> 800,000 × 0.85 = 680,000. ✓<br>Downstream campaigns (SMS reactivation, 10-15% expected conversion) correctly based on this figure.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
-
-  <div class="footer">CloudNine Rewards Strategy Dashboard · Built from Octopus multi-agent pipeline analysis · All financials synthetic (see Decision Log)</div>
+<!-- AIRPLANE -->
+<div class="airplane" id="airplane">
+  <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 42l6-2.5 4 7 11-9 7-2.5-2.5-3.5-9 2.5-4.5-6-5 4 3.5 5.5-7 2.5-3.5 2z" fill="url(#ag)"/>
+    <line x1="43" y1="29" x2="52" y2="20" stroke="url(#ag)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="72" y2="72"><stop stop-color="#05d9e8"/><stop offset="0.5" stop-color="#ffce00"/><stop offset="1" stop-color="#ff2a6d"/></linearGradient></defs>
+  </svg>
+  <div class="trail"></div>
 </div>
 
-<div class="pdf-overlay" id="pdfOverlay"><div class="spinner"></div><div class="pt">Generating PDF…</div><div class="ps">This may take a moment</div></div>
+<!-- CENTER CONTENT -->
+<div class="wrapper">
+  <div class="stage">
+    <div class="terminal"><span id="terminalText"></span><span class="cursor">|</span></div>
+    <div class="title">CLOUDNINE<span class="title-accent glitch">REWARDS</span></div>
+    <div class="sub">Strategy Dashboard — Octopus Pipeline v2</div>
+    <div class="btn-wrap">
+      <button class="btn" id="launchBtn"><span class="arrow">▶</span> Launch Control</button>
+    </div>
+    <div class="hint">Auto-launching in <span id="timer">6</span>s &middot; Press <kbd>Enter</kbd> or <kbd>Space</kbd></div>
+  </div>
+</div>
+
+<div class="status-bar"><span>◆</span> SYSTEM READY <span>◆</span></div>
 
 <script>
-// ─── TABS ───
-document.querySelectorAll('#agentTabs .tab-btn').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    document.querySelectorAll('#agentTabs .tab-btn').forEach(function(b){b.classList.remove('active')});
-    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
-    btn.classList.add('active');
-    document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
-  });
-});
-
-// ─── PARALLAX ───
+// ─── PERSPECTIVE GRID ───
 (function(){
-  var els = document.querySelectorAll('[data-parallax]');
-  if(els.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    window.addEventListener('scroll', function(){
-      var sy = window.pageYOffset;
-      els.forEach(function(el){
-        var s = parseFloat(el.getAttribute('data-parallax')) || 0.1;
-        var r = el.getBoundingClientRect();
-        if(r.top < window.innerHeight && r.bottom > 0) el.style.transform = 'translate3d(0,' + (sy * s) + 'px,0)';
-      });
-    }, {passive:true});
-  }
-})();
-
-// ─── SECTION REVEAL ───
-(function(){
-  var s = document.querySelectorAll('.section');
-  if(s.length && 'IntersectionObserver' in window){
-    var o = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){ e.target.classList.add('visible'); o.unobserve(e.target); }
-      });
-    }, {threshold:0.06});
-    s.forEach(function(el){ o.observe(el); });
-  }
-})();
-
-// ─── PDF EXPORT ───
-function exportPDF(){
-  var btn = document.getElementById('exportBtn');
-  if(btn.disabled) return;
-  btn.disabled = true; btn.textContent = 'Exporting…';
-  document.getElementById('pdfOverlay').classList.add('show');
-  var el = document.querySelector('.dashboard');
-  var opt = {
-    margin:[10,10,10,10], filename:'cloudnine-strategy-dashboard.pdf',
-    image:{type:'jpeg',quality:0.95}, html2canvas:{scale:2,useCORS:true,logging:false},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['avoid-all','css','legacy']}
-  };
-  html2pdf().set(opt).from(el).save().then(function(){
-    document.getElementById('pdfOverlay').classList.remove('show');
-    btn.disabled = false; btn.textContent = 'Export PDF';
-  }).catch(function(){
-    document.getElementById('pdfOverlay').classList.remove('show');
-    btn.disabled = false; btn.textContent = 'Export PDF';
-    alert('PDF export failed. Try again.');
-  });
-}
-
-// ─── HERO PARTICLES ───
-(function(){
-  var c = document.getElementById('heroCanvas');
-  if(!c) return;
-  var ctx = c.getContext('2d'), w, h, pts = [], n = 50;
-  function resize(){ w = c.width = c.parentElement.offsetWidth; h = c.height = c.parentElement.offsetHeight; }
-  resize();
-  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.8+0.3, dx:(Math.random()-0.5)*0.25, dy:(Math.random()-0.5)*0.25, o:Math.random()*0.5+0.08});
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    pts.forEach(function(p){
-      p.x += p.dx; p.y += p.dy;
-      if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
-      if(p.y < -10) p.y = h+10; if(p.y > h+10) p.y = -10;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(245,158,11,' + p.o + ')'; ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-  window.addEventListener('resize', resize);
-})();
-
-// ─── SCROLL TO TOP ───
-(function(){
-  var btn = document.getElementById('scrollTopBtn');
-  window.addEventListener('scroll', function(){
-    btn.classList.toggle('show', window.pageYOffset > 400);
-  }, {passive:true});
-})();
-
-// ─── COUNTERS ───
-(function(){
-  var c = document.querySelectorAll('[data-count]');
-  if(c.length && 'IntersectionObserver' in window){
-    var o = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){
-          var el = e.target, t = parseInt(el.getAttribute('data-count')), d = 1200, s = performance.now();
-          function f(now){
-            var p = Math.min((now - s) / d, 1), v = Math.round((1 - Math.pow(1 - p, 3)) * t);
-            el.textContent = v + '%';
-            if(p < 1) requestAnimationFrame(f); else el.textContent = t + '%';
-          }
-          requestAnimationFrame(f); o.unobserve(el);
-        }
-      });
-    }, {threshold:0.5});
-    c.forEach(function(el){ o.observe(el); });
-  }
-})();
-
-// ─── KPI BARS ───
-(function(){
-  var b = document.querySelectorAll('.kpi-bar-fill[data-width]');
-  if(b.length && 'IntersectionObserver' in window){
-    var o = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){
-          var w = parseInt(e.target.getAttribute('data-width'));
-          setTimeout(function(){ e.target.style.width = w + '%'; }, 200);
-          o.unobserve(e.target);
-        }
-      });
-    }, {threshold:0.3});
-    b.forEach(function(el){ o.observe(el); });
-  }
-})();
-
-// ─── FLOW TOGGLE ───
-function toggleFlow(id){
-  document.querySelectorAll('.flow-node').forEach(function(n){ n.classList.remove('active'); });
-  document.querySelectorAll('.flow-detail').forEach(function(d){ d.classList.remove('open'); });
-  document.querySelector('.flow-node[data-flow="' + id + '"]').classList.add('active');
-  document.getElementById('flow-' + id).classList.add('open');
-}
-
-// ─── FAILURE TOGGLE ───
-function toggleFail(el){
-  el.classList.toggle('open');
-  var b = el.nextElementSibling;
-  b.classList.toggle('open');
-}
-function showFailView(btn, group){
-  var parent = btn.closest('.fail-body');
-  parent.querySelectorAll('.tg-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  parent.querySelectorAll('.tg-content[data-group="' + group + '"]').forEach(function(c){ c.classList.remove('active'); });
-  var view = btn.textContent.trim().includes('Before') ? 'before' : 'after';
-  parent.querySelector('.tg-content[data-group="' + group + '"][data-view="' + view + '"]').classList.add('active');
-}
-
-// ─── PHASE EXPAND ───
-function togglePhase(el){
-  el.querySelector('.phase-expand').classList.toggle('open');
-}
-
-// ─── JOURNEY TOGGLE ───
-function toggleJourney(el, id){
-  document.querySelectorAll('.jstop').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.jdetail').forEach(function(d){ d.classList.remove('active'); });
-  el.classList.add('active');
-  document.getElementById(id).classList.add('active');
-}
-
-// ─── DECISION TIMELINE ───
-function toggleDecision(el){
-  el.querySelector('.dt-expand').classList.toggle('open');
-}
-
-// ─── RISK MATRIX TOOLTIP ───
-(function(){
-  var dots = document.querySelectorAll('.rq-dot');
-  var tip = document.getElementById('rqTooltip');
-  dots.forEach(function(d){
-    d.addEventListener('mouseenter', function(e){
-      tip.textContent = d.getAttribute('data-risk');
-      tip.classList.add('show');
-    });
-    d.addEventListener('mousemove', function(e){
-      tip.style.left = (e.pageX + 16) + 'px';
-      tip.style.top = (e.pageY - 10) + 'px';
-    });
-    d.addEventListener('mouseleave', function(){ tip.classList.remove('show'); });
-  });
-})();
-
-// ─── INTRO BANNER ───
-(function(){
-  var grid = document.getElementById('introGrid');
-  if(grid) for(var i = 0, L = 36; i < L; i++){
+  var gs = document.getElementById('gridStage');
+  if(!gs) return;
+  for(var i = 0, L = 40; i < L; i++){
     var ln = document.createElement('div');
-    ln.className = 'intro-grid-line';
+    ln.className = 'gln';
     var p = i / L;
-    ln.style.bottom = (p * p * 92) + '%';
-    ln.style.animationDelay = (p * 0.6) + 's';
-    ln.style.opacity = 1 - p * 0.8;
-    grid.appendChild(ln);
+    ln.style.bottom = (p * p * 90) + '%';
+    ln.style.animationDelay = (p * 0.5) + 's';
+    ln.style.opacity = Math.max(0.05, 1 - p * 0.85);
+    ln.style.background = 'linear-gradient(90deg,transparent,rgba(5,217,232,' + (0.04 + p * 0.04) + '),rgba(255,42,109,' + (0.02 + p * 0.02) + '),transparent)';
+    gs.appendChild(ln);
   }
 })();
+
+// ─── TYPEWRITER ───
 (function(){
   var el = document.getElementById('terminalText');
   if(!el) return;
   var txt = '> SYSTEM BOOT: OCTOPUS PIPELINE v2 — CLOUDNINE REWARDS', i = 0;
-  function ty(){ if(i < txt.length){ el.textContent += txt.charAt(i); i++; setTimeout(ty, 22 + Math.random()*28); } }
-  setTimeout(ty, 1100);
-})();
-(function(){
-  var el = document.getElementById('introTimer'), t = 5;
-  if(!el) return;
-  var iv = setInterval(function(){ t--; if(t <= 0){ clearInterval(iv); launchDashboard(); } else el.textContent = t; }, 1000);
-})();
-function launchDashboard(){
-  var b = document.getElementById('introBanner');
-  if(!b || b.classList.contains('hidden')) return;
-  b.classList.add('hidden');
-  setTimeout(function(){ b.style.display = 'none'; }, 1500);
-}
-(function(){
-  var c = document.getElementById('introCanvas');
-  if(!c) return;
-  var ctx = c.getContext('2d'), w, h, pts = [], n = 90;
-  function rs(){ w = c.width = c.parentElement.offsetWidth; h = c.height = c.parentElement.offsetHeight; }
-  rs();
-  for(var i = 0; i < n; i++) pts.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*2+0.3, dx:(Math.random()-0.5)*0.2, dy:(Math.random()-0.5)*0.2-0.04, o:Math.random()*0.4+0.06});
-  function dr(){
-    ctx.clearRect(0,0,w,h);
-    pts.forEach(function(p){
-      p.x += p.dx; p.y += p.dy;
-      if(p.x < -10) p.x = w+10; if(p.x > w+10) p.x = -10;
-      if(p.y < -20) p.y = h+20; if(p.y > h+20) p.y = -20;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = (p.y < h*0.35 ? 'rgba(255,42,109,' : 'rgba(5,217,232,') + p.o + ')';
-      ctx.fill();
-    });
-    requestAnimationFrame(dr);
+  function ty(){
+    if(i < txt.length){
+      el.textContent += txt.charAt(i);
+      i++;
+      setTimeout(ty, 18 + Math.random() * 32);
+    }
   }
-  dr();
-  window.addEventListener('resize', rs);
+  setTimeout(ty, 1200);
+})();
+
+// ─── TIMER & NAVIGATION ───
+(function(){
+  var el = document.getElementById('timer'), t = 6;
+  if(!el) return;
+  var iv = setInterval(function(){
+    t--;
+    if(t <= 0){ clearInterval(iv); goDashboard(); }
+    else el.textContent = t;
+  }, 1000);
+})();
+
+function goDashboard(){
+  window.location.href = 'dashboard.html';
+}
+
+// ─── KEYBOARD ───
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' || e.key === ' '){
+    e.preventDefault();
+    goDashboard();
+  }
+});
+
+// ─── PARTICLES (interactive) ───
+(function(){
+  var c = document.getElementById('particleCanvas');
+  if(!c) return;
+  var ctx = c.getContext('2d'), w, h, pts = [], n = 120, mx = -9999, my = -9999;
+
+  function resize(){
+    w = c.width = window.innerWidth;
+    h = c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for(var i = 0; i < n; i++){
+    pts.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4 - 0.06,
+      r: Math.random() * 2.2 + 0.4,
+      o: Math.random() * 0.35 + 0.08,
+      baseVx: 0,
+      baseVy: 0
+    });
+    pts[i].baseVx = pts[i].vx;
+    pts[i].baseVy = pts[i].vy;
+  }
+
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX;
+    my = e.clientY;
+  });
+  document.addEventListener('mouseleave', function(){
+    mx = -9999;
+    my = -9999;
+  });
+
+  function draw(){
+    ctx.clearRect(0, 0, w, h);
+    for(var i = 0; i < n; i++){
+      var p = pts[i];
+      var dx = p.x - mx;
+      var dy = p.y - my;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Mouse repulsion
+      if(dist < 150 && dist > 0){
+        var force = (150 - dist) / 150 * 0.6;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+      }
+      // Return to base velocity
+      p.vx += (p.baseVx - p.vx) * 0.02;
+      p.vy += (p.baseVy - p.vy) * 0.02;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Wrap
+      if(p.x < -10) p.x = w + 10;
+      if(p.x > w + 10) p.x = -10;
+      if(p.y < -20) p.y = h + 20;
+      if(p.y > h + 20) p.y = -20;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = (p.y < h * 0.35 ? 'rgba(255,42,109,' : 'rgba(5,217,232,') + p.o + ')';
+      ctx.fill();
+
+      // Connection lines near cursor
+      if(dist < 180 && dist > 0){
+        var alpha = (180 - dist) / 180 * 0.12;
+        ctx.beginPath();
+        ctx.moveTo(mx, my);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = 'rgba(5,217,232,' + alpha + ')';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Touch support
+  document.addEventListener('touchmove', function(e){
+    var t = e.touches[0];
+    mx = t.clientX;
+    my = t.clientY;
+  }, {passive: true});
+  document.addEventListener('touchend', function(){
+    mx = -9999;
+    my = -9999;
+  });
+})();
+
+// ─── MOUSE GRID TILT ───
+(function(){
+  var gs = document.getElementById('gridScene');
+  if(!gs) return;
+  var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  window.addEventListener('resize', function(){ cx = window.innerWidth / 2; cy = window.innerHeight / 2; });
+  document.addEventListener('mousemove', function(e){
+    var dx = (e.clientX - cx) / cx;
+    var dy = (e.clientY - cy) / cy;
+    gs.style.transform = 'translateX(' + (dx * 6) + 'px) translateY(' + (dy * -3) + 'px) rotateX(' + (-dy * 1.5) + 'deg)';
+  });
+})();
+
+// ─── CURSOR GLOW ───
+(function(){
+  var cg = document.getElementById('cursorGlow');
+  if(!cg) return;
+  document.addEventListener('mousemove', function(e){
+    cg.style.left = e.clientX + 'px';
+    cg.style.top = e.clientY + 'px';
+    cg.style.opacity = '1';
+  });
+  document.addEventListener('mouseleave', function(){
+    cg.style.opacity = '0';
+  });
+  // Touch: hide cursor glow
+  document.addEventListener('touchstart', function(){ cg.style.display = 'none'; });
+})();
+
+// ─── BUTTON RIPPLE ───
+(function(){
+  var btn = document.getElementById('launchBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(e){
+    var rect = btn.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    var ri = document.createElement('div');
+    ri.className = 'ripple-el';
+    ri.style.left = (x - 100) + 'px';
+    ri.style.top = (y - 100) + 'px';
+    btn.appendChild(ri);
+    setTimeout(function(){ ri.remove(); }, 700);
+    // Navigate after ripple
+    setTimeout(goDashboard, 200);
+  });
+  // Touch support
+  btn.addEventListener('touchend', function(e){
+    e.preventDefault();
+    var rect = btn.getBoundingClientRect();
+    var touch = e.changedTouches[0];
+    var x = touch.clientX - rect.left;
+    var y = touch.clientY - rect.top;
+    var ri = document.createElement('div');
+    ri.className = 'ripple-el';
+    ri.style.left = (x - 100) + 'px';
+    ri.style.top = (y - 100) + 'px';
+    btn.appendChild(ri);
+    setTimeout(function(){ ri.remove(); }, 700);
+    setTimeout(goDashboard, 200);
+  });
+})();
+
+// ─── SUN SCANNER BANDS ───
+(function(){
+  var sun = document.getElementById('sunDisplay');
+  if(!sun) return;
+  // Add animated scan band overlay
+  var scan = document.createElement('div');
+  scan.style.cssText = 'position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,0.03) 40%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 60%,transparent 100%);background-size:100% 200%;animation:scanBand 3s ease-in-out infinite';
+  var style = document.createElement('style');
+  style.textContent = '@keyframes scanBand{0%{background-position:0 0}100%{background-position:0 100%}}';
+  document.head.appendChild(style);
+  sun.appendChild(scan);
 })();
 </script>
 </body>
