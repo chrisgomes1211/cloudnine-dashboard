@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudNine Rewards — Strategy Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#0f1419;color:#e2e8f0;line-height:1.5;padding:32px 24px}
+.dashboard{max-width:1200px;margin:0 auto}
+
+/* Header */
+.header{margin-bottom:40px}
+.header h1{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.header h1 span{color:#f59e0b}
+.header p{font-size:14px;color:#64748b;margin-top:4px}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.last-updated{font-size:12px;color:#475569;padding:6px 12px;background:#1e293b;border-radius:6px}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
+.kpi-card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #2d3a4e;transition:border-color .2s}
+.kpi-card:hover{border-color:#3b4a64}
+.kpi-label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px}
+.kpi-main{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.kpi-current{font-size:32px;font-weight:800;color:#fff}
+.kpi-target{font-size:14px;color:#64748b}
+.kpi-target span{color:#f59e0b;font-weight:600}
+.kpi-progress{height:4px;background:#2d3a4e;border-radius:2px;margin-bottom:8px;overflow:hidden}
+.kpi-progress-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.kpi-progress-fill.on-track{background:#22c55e}
+.kpi-progress-fill.at-risk{background:#f59e0b}
+.kpi-progress-fill.off-track{background:#ef4444}
+.kpi-progress-fill.not-started{background:#64748b}
+.kpi-detail{display:flex;justify-content:space-between;font-size:12px;color:#475569}
+.kpi-detail span{display:flex;align-items:center;gap:4px}
+.kpi-detail .status-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.kpi-detail .status-dot.on-track{background:#22c55e}
+.kpi-detail .status-dot.at-risk{background:#f59e0b}
+.kpi-detail .status-dot.off-track{background:#ef4444}
+.kpi-detail .status-dot.not-started{background:#64748b}
+.kpi-unknown{font-size:12px;color:#64748b;font-style:italic}
+
+/* Row layout */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+@media(max-width:768px){.row{grid-template-columns:1fr}}
+
+/* Timeline */
+.timeline-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
+.timeline-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:20px}
+.phase-list{display:flex;flex-direction:column;gap:16px}
+.phase{display:grid;grid-template-columns:100px 1fr 100px;gap:16px;align-items:center;padding:12px 16px;background:#0f1419;border-radius:8px;border-left:3px solid}
+.phase.phase-1{border-left-color:#3b82f6}
+.phase.phase-2{border-left-color:#f59e0b}
+.phase.phase-3{border-left-color:#22c55e}
+.phase.phase-4{border-left-color:#8b5cf6}
+.phase-week{font-size:12px;color:#64748b;font-weight:600}
+.phase-info h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.phase-info p{font-size:12px;color:#64748b}
+.phase-budget{font-size:14px;font-weight:700;color:#f59e0b;text-align:right}
+.phase-status{font-size:11px;color:#64748b;text-align:right;margin-top:2px}
+
+/* Budget section */
+.budget-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
+.budget-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:20px}
+.budget-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px}
+.budget-total{font-size:28px;font-weight:800;color:#fff}
+.budget-total span{font-size:14px;color:#64748b;font-weight:400}
+.budget-rows{display:flex;flex-direction:column;gap:12px}
+.budget-row{display:grid;grid-template-columns:1fr 80px 200px;gap:12px;align-items:center}
+.budget-row .label{font-size:13px;color:#e2e8f0}
+.budget-row .amount{font-size:13px;font-weight:600;color:#f59e0b;text-align:right}
+.budget-row .bar-wrap{height:6px;background:#2d3a4e;border-radius:3px;overflow:hidden}
+.budget-row .bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#d97706)}
+
+/* Risk section */
+.risk-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
+.risk-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
+.risk-table{width:100%;border-collapse:collapse}
+.risk-table th{text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;padding:8px 12px;border-bottom:1px solid #2d3a4e}
+.risk-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #1a2332;vertical-align:middle}
+.risk-table tr:last-child td{border-bottom:none}
+.risk-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.risk-badge.high{background:rgba(239,68,68,0.15);color:#ef4444}
+.risk-badge.medium{background:rgba(245,158,11,0.15);color:#f59e0b}
+.risk-badge.low{background:rgba(34,197,94,0.15);color:#22c55e}
+
+/* Targets table */
+.targets-section{background:#1e293b;border-radius:12px;padding:24px;border:1px solid #2d3a4e;margin-bottom:24px}
+.targets-section h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
+.targets-table{width:100%;border-collapse:collapse}
+.targets-table th{text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;padding:8px 12px;border-bottom:1px solid #2d3a4e}
+.targets-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid #1a2332}
+.targets-table tr:last-child td{border-bottom:none}
+.targets-table .metric-name{color:#e2e8f0;font-weight:600}
+.targets-table .metric-current{color:#64748b}
+.targets-table .metric-six{color:#f59e0b;font-weight:600}
+.targets-table .metric-twelve{color:#22c55e;font-weight:600}
+
+.text-center{text-align:center}
+.gold{color:#f59e0b}
+.green{color:#22c55e}
+.muted{color:#64748b}
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>CloudNine <span>Rewards</span></h1>
+        <p>Strategy Dashboard — Experience & Retention Programme</p>
+      </div>
+      <div class="last-updated">Last updated: June 2026</div>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-label">Loyalty Active Rate</div>
+      <div class="kpi-main">
+        <div class="kpi-current">15%</div>
+        <div class="kpi-target">→ <span>30%</span> (6mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill at-risk" style="width:37%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot at-risk"></span> Off pace</span>
+        <span>680k dormant</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">PPAR (per-passenger ancillary)</div>
+      <div class="kpi-main">
+        <div class="kpi-current">--</div>
+        <div class="kpi-target">→ <span>+30%</span> (12mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot not-started"></span> No baseline</span>
+        <span class="kpi-unknown">Industry avg: ~$90/pp</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">Post-Booking Email Open Rate</div>
+      <div class="kpi-main">
+        <div class="kpi-current">&lt;40%</div>
+        <div class="kpi-target">→ <span>55%</span> (6mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill at-risk" style="width:30%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot at-risk"></span> Needs improvement</span>
+        <span>Target: 60% (12mo)</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">Onboarding Completion Rate</div>
+      <div class="kpi-main">
+        <div class="kpi-current">--</div>
+        <div class="kpi-target">→ <span>40%</span> (6mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot not-started"></span> Not tracked</span>
+        <span class="kpi-unknown">No current data</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">Self-Service Adoption Rate</div>
+      <div class="kpi-main">
+        <div class="kpi-current">--</div>
+        <div class="kpi-target">→ <span>60%</span> (6mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot not-started"></span> Not tracked</span>
+        <span class="kpi-unknown">Needs self-service hub first</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">Redemption Rate (points earned → used)</div>
+      <div class="kpi-main">
+        <div class="kpi-current">--</div>
+        <div class="kpi-target">→ <span>30%</span> (6mo)</div>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-fill not-started" style="width:0%"></div></div>
+      <div class="kpi-detail">
+        <span><span class="status-dot not-started"></span> Not tracked</span>
+        <span class="kpi-unknown">Needs loyalty reboot first</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Two-column: Timeline + Budget -->
+  <div class="row">
+
+    <!-- Timeline -->
+    <div class="timeline-section">
+      <h2>Implementation Timeline</h2>
+      <div class="phase-list">
+
+        <div class="phase phase-1">
+          <div class="phase-week">Weeks 1-4</div>
+          <div class="phase-info">
+            <h3>Foundation</h3>
+            <p>Email system • Self-service hub • Loyalty reconfig • Apple/Google Pay</p>
+          </div>
+          <div>
+            <div class="phase-budget">£200k</div>
+            <div class="phase-status">In progress</div>
+          </div>
+        </div>
+
+        <div class="phase phase-2">
+          <div class="phase-week">Weeks 5-6</div>
+          <div class="phase-info">
+            <h3>Launch — Re-engagement</h3>
+            <p>SMS dormant reactivation (680k) • Non-member acquisition start</p>
+          </div>
+          <div>
+            <div class="phase-budget">£100k</div>
+            <div class="phase-status">Not started</div>
+          </div>
+        </div>
+
+        <div class="phase phase-3">
+          <div class="phase-week">Weeks 7-12</div>
+          <div class="phase-info">
+            <h3>Journey Activation</h3>
+            <p>6-message sequence live • Contextual offers • Loyalty moments</p>
+          </div>
+          <div>
+            <div class="phase-budget">£50k</div>
+            <div class="phase-status">Not started</div>
+          </div>
+        </div>
+
+        <div class="phase phase-4">
+          <div class="phase-week">Months 3-6</div>
+          <div class="phase-info">
+            <h3>Optimisation & Scale</h3>
+            <p>A/B testing • Route personalisation • Bundles • Referral programme</p>
+          </div>
+          <div>
+            <div class="phase-budget">£150k</div>
+            <div class="phase-status">Not started</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Budget -->
+    <div class="budget-section">
+      <h2>Budget Allocation</h2>
+      <div class="budget-header">
+        <div class="budget-total">£500k <span>total</span></div>
+        <div style="font-size:13px;color:#22c55e">Target ROI: 3-5x in 12 months</div>
+      </div>
+      <div class="budget-rows">
+        <div class="budget-row">
+          <span class="label">Foundation</span>
+          <span class="amount">£200k</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:40%"></div></div>
+        </div>
+        <div class="budget-row">
+          <span class="label">Re-engagement Launch</span>
+          <span class="amount">£100k</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:20%"></div></div>
+        </div>
+        <div class="budget-row">
+          <span class="label">Journey Activation</span>
+          <span class="amount">£50k</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:10%"></div></div>
+        </div>
+        <div class="budget-row">
+          <span class="label">Optimisation & Scale</span>
+          <span class="amount">£150k</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:30%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Targets Table -->
+  <div class="targets-section">
+    <h2>KPI Targets</h2>
+    <table class="targets-table">
+      <thead>
+        <tr><th>Metric</th><th>Current</th><th>6-Month Target</th><th>12-Month Target</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="metric-name">Loyalty Active Rate</td><td class="metric-current">15%</td><td class="metric-six">30%</td><td class="metric-twelve">40%</td></tr>
+        <tr><td class="metric-name">PPAR (per-passenger ancillary) Increase</td><td class="metric-current">--</td><td class="metric-six">+20%</td><td class="metric-twelve">+30%</td></tr>
+        <tr><td class="metric-name">Post-Booking Email Open Rate</td><td class="metric-current">&lt;40%</td><td class="metric-six">55%</td><td class="metric-twelve">60%</td></tr>
+        <tr><td class="metric-name">Onboarding Completion Rate</td><td class="metric-current">--</td><td class="metric-six">40%</td><td class="metric-twelve">50%</td></tr>
+        <tr><td class="metric-name">Self-Service Adoption Rate</td><td class="metric-current">--</td><td class="metric-six">60%</td><td class="metric-twelve">75%</td></tr>
+        <tr><td class="metric-name">Redemption Rate (points earned → used)</td><td class="metric-current">--</td><td class="metric-six">30%</td><td class="metric-twelve">45%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Risk Register -->
+  <div class="risk-section">
+    <h2>Risk Register</h2>
+    <table class="risk-table">
+      <thead>
+        <tr><th style="width:25%">Risk</th><th style="width:10%">Likelihood</th><th style="width:10%">Impact</th><th style="width:55%">Mitigation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Points expiry backlash</td>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td><span class="risk-badge high">High</span></td>
+          <td class="muted">Frame as "use it or lose it" with clear value. Offer grace period for first re-engagement wave.</td>
+        </tr>
+        <tr>
+          <td>SMS opt-out rates high</td>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td class="muted">Cap at 2 SMS/month per dormant member. Offer email-only preference during sign-up.</td>
+        </tr>
+        <tr>
+          <td>Post-booking email fatigue</td>
+          <td><span class="risk-badge low">Low</span></td>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td class="muted">Cap at 6 messages per journey. A/B test frequency. Easy unsubscribe in every message.</td>
+        </tr>
+        <tr>
+          <td>Loyalty system integration delays</td>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td><span class="risk-badge high">High</span></td>
+          <td class="muted">Start Phase 1 early. Manual fallback for welcome rewards if system not ready.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center muted" style="font-size:12px;padding:16px 0;border-top:1px solid #1e293b;margin-top:24px">
+    CloudNine Rewards Strategy Dashboard • Based on Octopus multi-agent pipeline analysis
+  </div>
+
+</div>
+</body>
+</html>
